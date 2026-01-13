@@ -8,6 +8,8 @@ import com.umc.greaming.domain.work.repository.WorkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class WorkQueryService {
@@ -18,6 +20,9 @@ public class WorkQueryService {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.WORK_NOT_FOUND));
 
-        return WorkPreviewResponse.from(work);
+        // TODO: tags join되면 List<String> tags 채우기
+        List<String> tags = List.of();
+
+        return WorkPreviewResponse.from(work, tags);
     }
 }

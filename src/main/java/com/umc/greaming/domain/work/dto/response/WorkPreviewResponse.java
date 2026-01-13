@@ -2,24 +2,18 @@ package com.umc.greaming.domain.work.dto.response;
 
 import com.umc.greaming.domain.work.entity.Work;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 public record WorkPreviewResponse(
         Long workId,
-        String title,
-        String cover,
-        Integer likeCount,
-        Integer commentCount,
-        LocalDateTime createdAt
+        String thumbnailUrl,
+        List<String> tags
 ) {
-    public static WorkPreviewResponse from(Work work) {
+    public static WorkPreviewResponse from(Work work, List<String> tags) {
         return new WorkPreviewResponse(
                 work.getId(),
-                work.getTitle(),
-                work.getCover(),
-                work.getLikeCount(),
-                work.getCommentCount(),
-                work.getCreatedAt()
+                work.getCover(), // cover를 thumbnailUrl로 내려줌
+                tags
         );
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder({"isSuccess", "code", "message", "data"})
+@JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public class ApiResponse<T> {
 
     @JsonProperty("isSuccess")
@@ -22,29 +22,29 @@ public class ApiResponse<T> {
     private String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private T data;
+    private T result;
 
-    public static ResponseEntity<ApiResponse<Void>> success(BaseStatus successStatus) {
+    public static ResponseEntity<ApiResponse<Void>> success(BaseStatus status) {
         return ResponseEntity
-                .status(successStatus.getHttpStatus())
-                .body(new ApiResponse<>(true, successStatus.getCode(), successStatus.getMessage(), null));
+                .status(status.getHttpStatus())
+                .body(new ApiResponse<>(true, status.getCode(), status.getMessage(), null));
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> success(BaseStatus successStatus, T data) {
+    public static <T> ResponseEntity<ApiResponse<T>> success(BaseStatus status, T result) {
         return ResponseEntity
-                .status(successStatus.getHttpStatus())
-                .body(new ApiResponse<>(true, successStatus.getCode(), successStatus.getMessage(), data));
+                .status(status.getHttpStatus())
+                .body(new ApiResponse<>(true, status.getCode(), status.getMessage(), result));
     }
 
-    public static ResponseEntity<ApiResponse<Void>> error(BaseStatus errorStatus) {
+    public static ResponseEntity<ApiResponse<Void>> error(BaseStatus status) {
         return ResponseEntity
-                .status(errorStatus.getHttpStatus())
-                .body(new ApiResponse<>(false, errorStatus.getCode(), errorStatus.getMessage(), null));
+                .status(status.getHttpStatus())
+                .body(new ApiResponse<>(false, status.getCode(), status.getMessage(), null));
     }
 
-    public static ResponseEntity<ApiResponse<Void>> error(BaseStatus errorStatus, String message) {
+    public static ResponseEntity<ApiResponse<Void>> error(BaseStatus status, String message) {
         return ResponseEntity
-                .status(errorStatus.getHttpStatus())
-                .body(new ApiResponse<>(false, errorStatus.getCode(), message, null));
+                .status(status.getHttpStatus())
+                .body(new ApiResponse<>(false, status.getCode(), message, null));
     }
 }

@@ -17,7 +17,7 @@ public class WorkController {
 
     @GetMapping("/{workId}/preview")
     public ResponseEntity<ApiResponse<WorkPreviewResponse>> getWorkPreview(@PathVariable Long workId) {
-        WorkPreviewResponse response = workQueryService.getWorkPreview(workId);
-        return ApiResponse.success(SuccessStatus.WORK_PREVIEW_SUCCESS, response);
+        WorkPreviewResponse result = workQueryService.getWorkPreview(workId);
+        return ApiResponse.success(SuccessStatus.WORK_PREVIEW_SUCCESS, result);
     }
 }

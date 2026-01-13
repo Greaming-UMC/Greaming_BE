@@ -1,13 +1,9 @@
 package com.umc.greaming.common.exception;
 
 import com.umc.greaming.common.response.ApiResponse;
-import com.umc.greaming.common.base.BaseStatus;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,16 +26,15 @@ public class GeneralExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
-        String errorMessage = "잘못된 요청입니다: " + e.getMessage();
         log.error("[*] IllegalArgumentException :", e);
-        return ApiResponse.error(ErrorStatus.BAD_REQUEST, errorMessage);
+        return ApiResponse.error(ErrorStatus.BAD_REQUEST, "잘못된 요청입니다: " + e.getMessage());
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ApiResponse<Void>> handleNullPointerException(NullPointerException e) {
-        String errorMessage = "서버에서 예기치 않은 오류가 발생했습니다. 요청 처리 중 Null 값이 참조되었습니다.";
         log.error("[*] NullPointerException :", e);
-        return ApiResponse.error(ErrorStatus.INTERNAL_SERVER_ERROR, errorMessage);
+        return ApiResponse.error(ErrorStatus.INTERNAL_SERVER_ERROR,
+                "서버에서 예기치 않은 오류가 발생했습니다. (Null 참조)");
     }
 
     @ExceptionHandler(Exception.class)
@@ -55,33 +50,32 @@ public class GeneralExceptionAdvice extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
-        BaseStatus errorCode = ErrorStatus.BAD_REQUEST;
-        String errorMessage = ex.getBindingResult().getFieldErrors().isEmpty()
-                ? errorCode.getMessage()
+        String msg = ex.getBindingResult().getFieldErrors().isEmpty()
+                ? ErrorStatus.VALIDATION_ERROR.getMessage()
                 : ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
 
-        ApiResponse<Void> body = createApiResponse(errorCode, errorMessage);
-        return handleExceptionInternal(ex, body, headers, status, request);
+        return handleExceptionInternal(
+                ex,
+                ApiResponse.error(ErrorStatus.VALIDATION_ERROR, msg).getBody(),
+                headers,
+                status,
+                request
+        );
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
-            HttpRequestMethodNotSupportedException ex,
+            org.springframework.web.HttpRequestMethodNotSupportedException ex,
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request
     ) {
-        BaseStatus errorCode = ErrorStatus.METHOD_NOT_ALLOWED;
-        ApiResponse<Void> body = createApiResponse(errorCode, null);
-        return handleExceptionInternal(ex, body, headers, status, request);
-    }
-
-    private ApiResponse<Void> createApiResponse(BaseStatus errorStatus, String errorMessage) {
-        return new ApiResponse<>(
-                false,
-                errorStatus.getCode(),
-                (errorMessage != null ? errorMessage : errorStatus.getMessage()),
-                null
+        return handleExceptionInternal(
+                ex,
+                ApiResponse.error(ErrorStatus.METHOD_NOT_ALLOWED).getBody(),
+                headers,
+                status,
+                request
         );
     }
 }
