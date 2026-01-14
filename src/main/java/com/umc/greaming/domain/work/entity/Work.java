@@ -1,17 +1,16 @@
 package com.umc.greaming.domain.work.entity;
 
+import com.umc.greaming.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "submissions")
+@Table(name = "works")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Work {
+public class Work extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +29,5 @@ public class Work {
     @Column(name = "comment_count", nullable = false)
     private Integer commentCount;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+
 }
