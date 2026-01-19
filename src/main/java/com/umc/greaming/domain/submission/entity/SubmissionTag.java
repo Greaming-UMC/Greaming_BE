@@ -1,4 +1,4 @@
-package com.umc.greaming.domain.work.entity;
+package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.domain.tag.entity.Tag;
 import jakarta.persistence.*;
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class WorkTag {
+public class SubmissionTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class WorkTag {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submission_id", nullable = false)
-    private Work work;
+    private Submission work;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)

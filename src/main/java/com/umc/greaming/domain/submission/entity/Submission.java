@@ -1,4 +1,4 @@
-package com.umc.greaming.domain.work.entity;
+package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
 import jakarta.persistence.*;
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Work extends BaseEntity {
+public class Submission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
