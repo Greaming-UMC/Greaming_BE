@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface SubmissionTagRepository extends JpaRepository<SubmissionTag, Long> {
 
-    @Query("select wt.tag.name from WorkTag wt where wt.work.id = :workId")
-    List<String> findTagNamesByWorkId(@Param("workId") Long workId);
+    @Query("select sb.tag.name from SubmissionTag sb where sb.submission.id = :submissionId")
+    List<String> findTagNamesBySubmissionId(@Param("submissionId") Long submissionId);
 }

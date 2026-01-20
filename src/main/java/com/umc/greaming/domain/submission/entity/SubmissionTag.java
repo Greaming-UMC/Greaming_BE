@@ -19,7 +19,7 @@ public class SubmissionTag {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submission_id", nullable = false)
-    private Submission work;
+    private Submission submission;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)
