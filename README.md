@@ -78,3 +78,24 @@
 - **기능 개발**: `feat/12-greaming`
 - **버그 수정**: `fix/15-greaming`
 - **문서 작업**: `docs/20-greaming`
+
+## 🏃‍♂️ 로컬 개발 환경 설정 
+
+이 프로젝트는 보안을 위해 로컬 설정 파일(`application-local.yml`)을 Git에 올리지 않습니다.
+프로젝트를 실행하려면 아래 순서대로 설정을 진행해 주세요.
+
+### 1. 설정 파일 생성
+`src/main/resources` 폴더로 이동하여 템플릿 파일을 복사합니다.
+
+- **복사할 원본:** `application-local.yml.example`
+- **생성할 파일명:** `application-local.yml`
+
+### 2. DB 정보 입력
+생성된 `application-local.yml` 파일을 열고, 본인의 로컬 DB 정보를 입력합니다.
+환경변수로 사용하시던 분들은 사용하던 대로 환경변수명으로 입력해주시면 됩니다.
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/내_로컬_DB_이름
+    username: root  # 본인 로컬 DB 아이디
+    password: 1234  # 본인 로컬 DB 비밀번호
