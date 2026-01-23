@@ -1,0 +1,19 @@
+# 테스트 서버 설정
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: dev # dev 프로필일 때만 이 설정 사용
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
