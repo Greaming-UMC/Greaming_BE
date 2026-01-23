@@ -1,0 +1,59 @@
+name: Deploy DEV (Develop)
+
+on:
+  push:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # 빌드
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      # 도커 이미지 빌드 & 푸시
+      - name: Docker Build & Push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_REPO }} .
+          docker push ${{ secrets.DOCKER_REPO }}
+
+      # 3. EC2 접속 & 배포 실행
+      - name: Deploy to Dev Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo docker stop greaming-dev || true
+            sudo docker rm greaming-dev || true
+            
+            sudo docker pull ${{ secrets.DOCKER_REPO }}
+            
+            # 개발 서버 실행 (포트 8081, 프로필 dev)
+            sudo docker run -d -p 8081:8081 --name greaming-dev \
+            -e TZ=Asia/Seoul \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            -e SPRING_DATASOURCE_URL="${{ secrets.DEV_DB_URL }}" \
+            -e SPRING_DATASOURCE_USERNAME="${{ secrets.RDS_USERNAME }}" \
+            -e SPRING_DATASOURCE_PASSWORD="${{ secrets.RDS_PASSWORD }}" \
+            ${{ secrets.DOCKER_REPO }}
+            
+            # 불필요한 이미지 정리
+            sudo docker image prune -f
