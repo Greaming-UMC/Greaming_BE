@@ -46,6 +46,7 @@ public class Challenge extends BaseEntity {
 
     @Column(nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer participant = 0;
 
     @Column(nullable = false, length = 100)
@@ -59,6 +60,7 @@ public class Challenge extends BaseEntity {
 
     @Column(name = "is_archived", nullable = false)
     @ColumnDefault("false")
+    @Builder.Default
     private Boolean isArchived = false;
 
 }

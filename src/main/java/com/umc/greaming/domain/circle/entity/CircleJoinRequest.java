@@ -31,6 +31,7 @@ public class CircleJoinRequest extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     @ColumnDefault("'PENDING'")
+    @Builder.Default
     private CircleJoinRequestStatus status = CircleJoinRequestStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)

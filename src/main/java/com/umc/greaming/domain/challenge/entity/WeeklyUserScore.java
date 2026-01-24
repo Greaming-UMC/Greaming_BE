@@ -33,22 +33,27 @@ public class WeeklyUserScore extends BaseEntity {
 
     @Column(name = "base_score", nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer baseScore = 0;
 
     @Column(name = "attendance_score", nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer attendanceScore = 0;
 
     @Column(name = "like_score", nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer likeScore = 0;
 
     @Column(name = "goal_bonus", nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer goalBonus = 0;
 
     @Column(name = "total_score", nullable = false)
     @ColumnDefault("0")
+    @Builder.Default
     private Integer totalScore = 0;
 
     @Enumerated(EnumType.STRING)

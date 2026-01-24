@@ -31,6 +31,7 @@ public class CircleMember extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     @ColumnDefault("'MEMBER'")
+    @Builder.Default
     private CircleMemberRole role = CircleMemberRole.MEMBER;
 
 }

@@ -30,6 +30,7 @@ public class Follow extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "follow_state", nullable = false)
     @ColumnDefault("'COMPLETED'")
+    @Builder.Default
     private FollowState state = FollowState.COMPLETED;
 
 }

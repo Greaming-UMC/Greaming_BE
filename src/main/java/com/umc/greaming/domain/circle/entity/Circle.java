@@ -31,6 +31,7 @@ public class Circle extends BaseEntity {
 
     @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
+    @Builder.Default
     private Boolean isDeleted = false;
 
 }
