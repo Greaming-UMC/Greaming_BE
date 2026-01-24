@@ -1,6 +1,6 @@
 package com.umc.greaming.domain.submission.enums;
 
-public enum Visibility{
+public enum SubmissionVisibility {
     PUBLIC,
     CIRCLE
 }

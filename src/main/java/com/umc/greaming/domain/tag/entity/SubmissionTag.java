@@ -1,6 +1,7 @@
-package com.umc.greaming.domain.submission.entity;
+package com.umc.greaming.domain.tag.entity;
 
-import com.umc.greaming.domain.tag.entity.Tag;
+import com.umc.greaming.common.base.BaseEntity;
+import com.umc.greaming.domain.submission.entity.Submission;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SubmissionTag {
+public class SubmissionTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

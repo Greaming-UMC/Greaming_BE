@@ -2,11 +2,12 @@ package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
 import com.umc.greaming.domain.submission.enums.SubmissionField;
-import com.umc.greaming.domain.submission.enums.Visibility;
+import com.umc.greaming.domain.submission.enums.SubmissionVisibility;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "submissions")
@@ -24,32 +25,34 @@ public class Submission extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
 /*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
-    private Challenge challenge; // Nullable
+    private Challenge challenge;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "circle_id")
-    private Circle circle; // Nullable
+    private Circle circle;
 */
-    @Column(nullable = false)
+
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(name = "thumbnail_url", nullable = false)
     private String thumbnailUrl;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "caption", columnDefinition = "TEXT")
     private String caption;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "field", nullable = false)
-    private SubmissionField field; // 게시물 유형 WEEKLY, DAILY
+    private SubmissionField field;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(name = "visibility", nullable = false, length = 10)
     @ColumnDefault("'PUBLIC'")
-    private Visibility visibility; // 공개범위 (PUBLIC, CIRCLE)
+    private SubmissionVisibility visibility;
 
     @Column(name = "comment_enabled", nullable = false)
     @ColumnDefault("true")
@@ -70,4 +73,7 @@ public class Submission extends BaseEntity {
     @ColumnDefault("0")
     @Builder.Default
     private int bookmarkCount = 0;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

@@ -1,5 +1,6 @@
 package com.umc.greaming.domain.tag.entity;
 
+import com.umc.greaming.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
