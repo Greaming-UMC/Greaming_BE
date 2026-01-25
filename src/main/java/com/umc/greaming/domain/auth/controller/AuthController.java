@@ -1,13 +1,10 @@
 package com.umc.greaming.domain.auth.controller;
 
-import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.response.ApiResponse;
-import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.auth.dto.response.ReissueResponse;
 import com.umc.greaming.domain.auth.dto.response.TokenResponse;
 import com.umc.greaming.domain.auth.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
