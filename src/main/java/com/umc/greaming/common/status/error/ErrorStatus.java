@@ -21,6 +21,8 @@ public enum ErrorStatus implements BaseStatus {
     //auth
     INVALID_TOKEN("AUTH_401", HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN("AUTH_401", HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    REFRESH_TOKEN_NOT_FOUND("AUTH_401", HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
+    REFRESH_TOKEN_EXPIRED("AUTH_401", HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
     INVALID_PASSWORD("AUTH_400", HttpStatus.BAD_REQUEST, "비밀번호가 올바르지 않습니다."),
     PASSWORD_SAME_AS_OLD("AUTH_400", HttpStatus.BAD_REQUEST, "새 비밀번호가 기존 비밀번호와 동일합니다."),
     USER_NOT_FOUND("AUTH_404", HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
