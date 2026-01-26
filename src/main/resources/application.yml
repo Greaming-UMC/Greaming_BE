@@ -18,3 +18,11 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+  # AWS S3 설정
+  spring:
+    cloud:
+      aws:
+        credentials:
+          access-key: ${AWS_ACCESS_KEY_ID}
+          secret-key: ${AWS_SECRET_ACCESS_KEY}
