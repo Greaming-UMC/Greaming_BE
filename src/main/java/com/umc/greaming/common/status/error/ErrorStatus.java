@@ -28,7 +28,10 @@ public enum ErrorStatus implements BaseStatus {
     DUPLICATE_NICKNAME("AUTH_409", HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
 
     //작품 미리보기
-    WORK_NOT_FOUND("WORK_404", HttpStatus.NOT_FOUND, "작품을 찾을 수 없습니다.");
+    WORK_NOT_FOUND("WORK_404", HttpStatus.NOT_FOUND, "작품을 찾을 수 없습니다."),
+
+    //s3
+    S3_UPLOAD_FAILED("S3_500", HttpStatus.INTERNAL_SERVER_ERROR, "Presigned URL 발급에 실패했습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;

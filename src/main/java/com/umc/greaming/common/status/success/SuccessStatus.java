@@ -31,7 +31,10 @@ public enum SuccessStatus implements BaseStatus {
     CONFIRM_PASSWORD_SUCCESS("AUTH_200", HttpStatus.OK, "비밀번호 검증 성공"),
 
     //작품 미리보기
-    WORK_PREVIEW_SUCCESS("WORK_200", HttpStatus.OK, "작품 미리보기 조회 성공");
+    WORK_PREVIEW_SUCCESS("WORK_200", HttpStatus.OK, "작품 미리보기 조회 성공"),
+
+    //s3
+    S3_UPLOAD_SUCCESS("S3_200", HttpStatus.OK, "Presigned URL 발급 성공");
 
     private final String code;
     private final HttpStatus httpStatus;
