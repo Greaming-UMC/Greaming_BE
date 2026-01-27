@@ -22,6 +22,18 @@ public class S3Service {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
 
+    @Value("${spring.cloud.aws.s3.region.static")
+    private String region;
+
+    // 공개 버킷용 String 합치기
+    public String getPublicUrl(String key){
+        if (key == null || key.isEmpty()){
+            return null;
+        }
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
+    }
+
+    // 비공개 버킷용 Presigned URL 발급
     public S3PresignedUrlDto getPresignedUrl(String prefix, String fileName) {
         try {
             String key = createPath(prefix, fileName);
