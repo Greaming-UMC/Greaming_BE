@@ -4,6 +4,7 @@ import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
+import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
@@ -70,5 +71,27 @@ public class SubmissionQueryService {
     private Submission findSubmissionByIdOrThrow(Long submissionId) {
         return submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+    }
+
+    public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request){ //, Long userId) {
+
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+    /*
+        if (!submission.getUser().getId().equals(userId)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN);
+        }
+    */
+        if (request.title() != null) {
+            submission.setTitle(request.title());
+        }
+        if (request.caption() != null) {
+            submission.setCaption(request.caption());
+        }
+
+        List<String> currentImages = request.imageList();
+        List<String> currentTags = request.tags();
+
+        return SubmissionInfo.from(submission, currentImages, currentTags, false);
     }
 }
