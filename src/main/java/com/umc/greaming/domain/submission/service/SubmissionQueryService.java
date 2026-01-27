@@ -33,6 +33,11 @@ public class SubmissionQueryService {
     private final SubmissionImageRepository submissionImageRepository;
     private static final int PAGE_SIZE = 30;
 
+    private Submission findSubmissionByIdOrThrow(Long submissionId) {
+        return submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+    }
+
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
@@ -68,30 +73,5 @@ public class SubmissionQueryService {
 
         return SubmissionInfo.from(submission, sortedImages, tags, isLiked);
     }
-    private Submission findSubmissionByIdOrThrow(Long submissionId) {
-        return submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
-    }
 
-    public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request){ //, Long userId) {
-
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
-    /*
-        if (!submission.getUser().getId().equals(userId)) {
-            throw new GeneralException(ErrorStatus.FORBIDDEN);
-        }
-    */
-        if (request.title() != null) {
-            submission.setTitle(request.title());
-        }
-        if (request.caption() != null) {
-            submission.setCaption(request.caption());
-        }
-
-        List<String> currentImages = request.imageList();
-        List<String> currentTags = request.tags();
-
-        return SubmissionInfo.from(submission, currentImages, currentTags, false);
-    }
 }

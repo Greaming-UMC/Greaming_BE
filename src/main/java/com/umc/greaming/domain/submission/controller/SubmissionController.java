@@ -5,6 +5,7 @@ import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
+import com.umc.greaming.domain.submission.service.SubmissionCommandService;
 import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 public class SubmissionController {
 
     private final SubmissionQueryService submissionQueryService;
+    private final SubmissionCommandService submissionCommandService;
 
     @GetMapping("/{submissionId}/preview")
     public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(@PathVariable @Positive Long submissionId) {
@@ -45,7 +47,13 @@ public class SubmissionController {
             @RequestBody SubmissionUpdateRequest updateSubmission
             //,@AuthenticationPrincipal UserDetails userDetails
             ) {
-        SubmissionInfo result = submissionQueryService.updateSubmission(submissionId, updateSubmission);
+        SubmissionInfo result = submissionCommandService.updateSubmission(submissionId, updateSubmission);
         return ApiResponse.success(SuccessStatus.SUBMISSION_UPDATE, result);
+    }
+
+    @DeleteMapping("/{submissionId}")
+    public ResponseEntity<ApiResponse<Long>> deleteSubmission(@PathVariable @Positive Long submissionId) {
+        submissionCommandService.deleteSubmission(submissionId); //userId 추가필요
+        return ApiResponse.success(SuccessStatus.SUBMISSION_DELETED, submissionId);
     }
 }
