@@ -24,12 +24,11 @@ public record SubmissionInfo(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime uploadAt
 ) {
-    // 엔티티 -> DTO 변환 로직을 여기로 이동 (응집도 향상)
     public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<String> tags, boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
                 submission.getUser().getProfileImageUrl(),
-                "Painter", // 레벨
+                "Painter",
                 sortedImages,
                 submission.getLikeCount(),
                 submission.getCommentCount(),
