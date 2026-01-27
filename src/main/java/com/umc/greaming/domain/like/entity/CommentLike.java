@@ -2,7 +2,7 @@ package com.umc.greaming.domain.like.entity;
 
 
 import com.umc.greaming.common.base.BaseEntity;
-import com.umc.greaming.domain.submission.entity.Submission;
+import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,8 +27,7 @@ public class CommentLike extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "submission_id", nullable = false)
-    private Submission submission;
-
+    @JoinColumn(name = "comment_id", nullable = false) // DB 컬럼명도 comment_id로 변경
+    private Comment comment;
 }
 

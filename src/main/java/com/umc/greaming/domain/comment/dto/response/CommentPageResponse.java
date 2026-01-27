@@ -17,7 +17,7 @@ public record CommentPageResponse(
                 commentPage.getContent().stream()
                         .map(CommentInfo::from)
                         .toList(),
-                commentPage.getNumber(),
+                commentPage.getNumber()+1,
                 commentPage.getTotalPages(),
                 commentPage.getTotalElements(),
                 commentPage.isLast()

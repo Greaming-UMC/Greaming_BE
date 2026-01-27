@@ -30,41 +30,45 @@ public class SubmissionQueryService {
     private final SubmissionTagRepository submissionTagRepository;
     private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
+    private static final int PAGE_SIZE = 30;
 
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.WORK_NOT_FOUND));
-
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
 
         return SubmissionPreviewResponse.from(submission, tags);
     }
     public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page) {
-        SubmissionInfo submissionInfo = getSubmissionInfo(submissionId);
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.WORK_NOT_FOUND));
-
-        Pageable pageable = PageRequest.of(page - 1, 30, Sort.by("createdAt").descending());
-
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission);
+        int pageIndex = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("createdAt").descending());
         Page<Comment> commentPage = commentRepository.findAllBySubmission(submission, pageable);
 
         return SubmissionDetailResponse.from(submissionInfo, commentPage);
     }
 
     public SubmissionInfo getSubmissionInfo(Long submissionId) {
-        // 1. 엔티티 조회
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.WORK_NOT_FOUND));
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        return createSubmissionInfoFromEntity(submission);
+    }
+
+    private SubmissionInfo createSubmissionInfoFromEntity(Submission submission) {
+        Long submissionId = submission.getId();
 
         List<String> sortedImages = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
                 .stream()
-                .map(SubmissionImage::getImageUrl) // URL만 추출
+                .map(SubmissionImage::getImageUrl)
                 .toList();
 
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
 
-        boolean isLiked = true;
+        boolean isLiked = false;
 
         return SubmissionInfo.from(submission, sortedImages, tags, isLiked);
+    }
+    private Submission findSubmissionByIdOrThrow(Long submissionId) {
+        return submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
     }
 }

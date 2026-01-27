@@ -31,10 +31,4 @@ public class SubmissionController {
         SubmissionDetailResponse result = submissionQueryService.getSubmissionDetail(submissionId, page);
         return ApiResponse.success(SuccessStatus.SUBMISSION_DETAIL_SUCCESS, result);
     }
-    /*
-    @PutMapping("/{submissionId}")
-    public ResponseEntity<ApiResponse<SubmissionFixResponse>> updateSubmission(
-            @PathVariable @
-    )
-     */
 }
