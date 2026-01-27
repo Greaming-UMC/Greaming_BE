@@ -27,8 +27,21 @@ public class SubmissionController {
 
     @GetMapping("/{submissionId}")
     public ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
-            @PathVariable @Positive Long submissionId, @RequestParam(defaultValue = "1") @Positive int page) {
+            @PathVariable @Positive Long submissionId,
+            @RequestParam(defaultValue = "1") @Positive int page
+            //,@AuthenticationPrincipal UserDetails userDetails
+    ) {
         SubmissionDetailResponse result = submissionQueryService.getSubmissionDetail(submissionId, page);
         return ApiResponse.success(SuccessStatus.SUBMISSION_DETAIL_SUCCESS, result);
+    }
+
+    @PutMapping("/{submissionId}")
+    public ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
+            @PathVariable @Positive Long submissionId,
+            @RequestBody SubmissionUpdateRequest updateSubmission
+            //,@AuthenticationPrincipal UserDetails userDetails
+            ) {
+        SubmissionInfo result = submissionQueryService.updateSubmission(submissionId, updateSubmission);
+        return ApiResponse.success(SuccessStatus.SUBMISSION_UPDATE, result);
     }
 }
