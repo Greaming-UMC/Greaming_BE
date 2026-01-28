@@ -1,6 +1,7 @@
 package com.umc.greaming.domain.auth.security.oauth2;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
@@ -10,41 +11,51 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getProviderId() {
-        return String.valueOf(attributes.get("id"));
+        Object id = attributes.get("id");
+        return id != null ? String.valueOf(id) : null;
     }
 
     @Override
     public String getEmail() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        if (kakaoAccount == null) {
-            return null;
-        }
-        return (String) kakaoAccount.get("email");
+        return getKakaoAccount()
+                .map(account -> getStringValue(account, "email"))
+                .orElse(null);
     }
 
     @Override
     public String getName() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        if (kakaoAccount == null) {
-            return null;
-        }
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        if (profile == null) {
-            return null;
-        }
-        return (String) profile.get("nickname");
+        return getProfile()
+                .map(profile -> getStringValue(profile, "nickname"))
+                .orElse(null);
     }
 
     @Override
     public String getProfileImageUrl() {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        if (kakaoAccount == null) {
-            return null;
+        return getProfile()
+                .map(profile -> getStringValue(profile, "profile_image_url"))
+                .orElse(null);
+    }
+
+    private Optional<Map<String, Object>> getKakaoAccount() {
+        return getMapValue(attributes, "kakao_account");
+    }
+
+    private Optional<Map<String, Object>> getProfile() {
+        return getKakaoAccount()
+                .flatMap(account -> getMapValue(account, "profile"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Optional<Map<String, Object>> getMapValue(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        if (value instanceof Map) {
+            return Optional.of((Map<String, Object>) value);
         }
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        if (profile == null) {
-            return null;
-        }
-        return (String) profile.get("profile_image_url");
+        return Optional.empty();
+    }
+
+    private String getStringValue(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value instanceof String ? (String) value : null;
     }
 }

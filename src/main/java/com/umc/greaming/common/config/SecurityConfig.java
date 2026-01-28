@@ -1,5 +1,6 @@
 package com.umc.greaming.common.config;
 
+import com.umc.greaming.domain.auth.security.JwtAuthenticationEntryPoint;
 import com.umc.greaming.domain.auth.security.JwtAuthenticationFilter;
 import com.umc.greaming.domain.auth.security.oauth2.CustomOAuth2UserService;
 import com.umc.greaming.domain.auth.security.oauth2.OAuth2SuccessHandler;
@@ -18,42 +19,44 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final CorsConfigurationSource corsConfigurationSource;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final OAuth2Config oAuth2Config;
+
+    private final String[] PUBLIC_URLS = {
+            "/api/auth/login/**",
+            "/api/auth/reissue",
+            "/oauth2/**",
+            "/login/oauth2/**",
+            "/h2-console/**",
+            "/api/works/**"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        HttpSecurity httpSecurity = http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/oauth2/**",
-                                "/login/oauth2/**",
-                                "/h2-console/**",
-                                "/api/works/**"
+                                PUBLIC_URLS
                         ).permitAll()
+                        .requestMatchers(
+                                "/actuator/**"
+                        )
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authorization ->
-                                authorization.baseUri("/oauth2/authorize")
-                        )
-                        .redirectionEndpoint(redirection ->
-                                redirection.baseUri("/login/oauth2/code/*")
-                        )
-                        .userInfoEndpoint(userInfo ->
-                                userInfo.userService(customOAuth2UserService)
-                        )
-                        .successHandler(oAuth2SuccessHandler)
-                )
+                .oauth2Login(oAuth2Config::configure)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
