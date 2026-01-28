@@ -29,3 +29,6 @@ spring:
       credentials:
         access-key: ${AWS_ACCESS_KEY_ID}
         secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+swagger:
+  url: http://localhost:8080

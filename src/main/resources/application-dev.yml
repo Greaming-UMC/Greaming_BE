@@ -17,3 +17,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+swagger:
+  url: http://13.124.68.142:8081

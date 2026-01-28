@@ -1,11 +1,10 @@
-# 실제 서비스 서버 설정
 server:
   port: 8080
 
 spring:
   config:
     activate:
-      on-profile: prod # prod 프로필일 때만 이 설정 사용
+      on-profile: prod
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,6 +14,9 @@ spring:
 
   jpa:
     hibernate:
-      # 서비스가 안정화되면 나중에 validate로 변경 예정
+      # 서비스가 안정화되면 나중에 validate로 변경
       ddl-auto: update
     show-sql: false
+
+swagger:
+  url: http://13.124.68.142:8080
