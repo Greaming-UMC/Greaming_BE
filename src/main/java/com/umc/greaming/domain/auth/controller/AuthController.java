@@ -1,6 +1,8 @@
 package com.umc.greaming.domain.auth.controller;
 
+import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.response.ApiResponse;
+import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.auth.dto.response.ReissueResponse;
 import com.umc.greaming.domain.auth.dto.response.TokenResponse;
@@ -28,17 +30,30 @@ public class AuthController {
             @PathVariable String provider,
             HttpServletResponse response
     ) throws IOException {
-        String redirectUrl = "/oauth2/authorize/" + provider.toLowerCase();
+        // 서비스 계층에서 프로바이더 검증
+        authService.validateSocialProvider(provider);
+
+        String redirectUrl = "/oauth2/authorization/" + provider.toLowerCase();
         response.sendRedirect(redirectUrl);
     }
 
+    /**
+     * 토큰 재발급 API
+     * @param refreshToken 헤더로 전달받은 리프레시 토큰
+     * @return 새로운 액세스 토큰과 리프레시 토큰
+     * @throws GeneralException 리프레시 토큰이 null, 빈 문자열, 또는 공백만 있는 경우
+     */
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<TokenResponse>> reissueToken(
-            @RequestHeader(REFRESH_TOKEN_HEADER) String refreshToken
+            @RequestHeader(value = REFRESH_TOKEN_HEADER, required = false) String refreshToken
     ) {
+        // 리프레시 토큰 null, 빈 문자열, 공백 검증
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            throw new GeneralException(ErrorStatus.REFRESH_TOKEN_MISSING);
+        }
+
         ReissueResponse reissueResponse = authService.reissueTokens(refreshToken);
 
-        // 액세스 토큰은 바디로, 리프레시 토큰은 헤더로
         TokenResponse bodyResponse = TokenResponse.of(
                 reissueResponse.accessToken(),
                 reissueResponse.accessTokenExpiresIn()
@@ -50,7 +65,7 @@ public class AuthController {
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(new com.umc.greaming.common.response.ApiResponse<>(
+                .body(new ApiResponse<>(
                         true,
                         SuccessStatus.CREATE_TOKEN_SUCCESS.getCode(),
                         SuccessStatus.CREATE_TOKEN_SUCCESS.getMessage(),
@@ -58,10 +73,23 @@ public class AuthController {
                 ));
     }
 
+    /**
+     * 로그아웃 API
+     * <p>인증된 사용자만 접근 가능합니다. SecurityFilterChain에서 인증을 먼저 검증합니다.</p>
+     *
+     * @param userId 현재 인증된 사용자의 ID (Spring Security에서 자동 주입)
+     * @return 로그아웃 성공 응답
+     * @throws GeneralException 인증 정보가 없는 경우 (UNAUTHORIZED)
+     */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal Long userId
     ) {
+        // Spring Security 필터를 통과했음에도 userId가 null인 경우 (비정상 상황)
+        if (userId == null) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED);
+        }
+
         authService.logout(userId);
         return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
     }

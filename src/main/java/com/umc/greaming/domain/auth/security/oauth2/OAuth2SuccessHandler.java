@@ -24,10 +24,10 @@ import java.util.Map;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final String REFRESH_TOKEN_HEADER = "X-Refresh-Token";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(

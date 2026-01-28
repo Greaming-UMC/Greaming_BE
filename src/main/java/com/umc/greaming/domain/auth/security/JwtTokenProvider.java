@@ -85,7 +85,18 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return Long.parseLong(claims.getSubject());
+        String subject = claims.getSubject();
+        if (subject == null || subject.isBlank()) {
+            log.warn("JWT 토큰에 subject가 없습니다.");
+            return null;
+        }
+
+        try {
+            return Long.parseLong(subject);
+        } catch (NumberFormatException e) {
+            log.warn("JWT 토큰의 subject를 Long으로 변환할 수 없습니다: {}", subject);
+            return null;
+        }
     }
 
     public boolean validateToken(String token) {

@@ -4,6 +4,7 @@ import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.auth.dto.response.ReissueResponse;
 import com.umc.greaming.domain.auth.entity.RefreshToken;
+import com.umc.greaming.domain.auth.entity.SocialProvider;
 import com.umc.greaming.domain.auth.repository.RefreshTokenRepository;
 import com.umc.greaming.domain.auth.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,16 @@ public class AuthService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    /**
+     * 소셜 로그인 프로바이더 검증
+     * @param provider 소셜 프로바이더 문자열 (kakao, google)
+     * @return 검증된 SocialProvider enum
+     * @throws GeneralException 지원하지 않는 프로바이더인 경우
+     */
+    public SocialProvider validateSocialProvider(String provider) {
+        return SocialProvider.from(provider);
+    }
 
     @Transactional
     public String createAndSaveRefreshToken(Long userId) {

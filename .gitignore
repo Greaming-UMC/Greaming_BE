@@ -41,3 +41,6 @@ out/
 ### Application-local.yml(개인 설정 파일 무시) ###
 application-local.yml
 src/main/resources/application-local.yml
+
+### Environment Variables ###
+.env
