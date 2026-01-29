@@ -44,13 +44,15 @@ jobs:
             
             sudo docker pull ${{ secrets.DOCKER_REPO }}
             
-            # 운영 서버 실행 
+            # 운영 서버 실행
             sudo docker run -d -p 8080:8080 --name greaming-prod \
             -e TZ=Asia/Seoul \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e SPRING_DATASOURCE_URL="${{ secrets.PROD_DB_URL }}" \
             -e SPRING_DATASOURCE_USERNAME="${{ secrets.RDS_USERNAME }}" \
             -e SPRING_DATASOURCE_PASSWORD="${{ secrets.RDS_PASSWORD }}" \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             ${{ secrets.DOCKER_REPO }}
             
             sudo docker image prune -f
