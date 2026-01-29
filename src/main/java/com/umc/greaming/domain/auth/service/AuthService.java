@@ -9,6 +9,7 @@ import com.umc.greaming.domain.auth.repository.RefreshTokenRepository;
 import com.umc.greaming.domain.auth.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,16 +71,19 @@ public class AuthService {
         }
 
         Long userId = savedToken.getUserId();
-        LocalDateTime originalExpiresAt = savedToken.getExpiresAt();
+
+        // 새 리프레시 토큰 만료 시간 계산 (JWT와 DB 만료일자 일치)
+        LocalDateTime newExpiresAt = LocalDateTime.now()
+                .plusSeconds(jwtTokenProvider.getRefreshTokenExpiration() / 1000);
 
         // 새 액세스 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
 
-        // 새 리프레시 토큰 발급 (기존 만료일자 유지)
-        String newRefreshToken = jwtTokenProvider.createRefreshTokenWithExpiry(userId, originalExpiresAt);
+        // 새 리프레시 토큰 발급 (새 만료일자 사용)
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
 
-        // DB 업데이트 (만료일자는 그대로 유지)
-        savedToken.updateToken(newRefreshToken, originalExpiresAt);
+        // DB 업데이트 (JWT와 동일한 만료일자 사용)
+        savedToken.updateToken(newRefreshToken, newExpiresAt);
 
         log.info("토큰 재발급: userId={}", userId);
 
@@ -93,6 +97,7 @@ public class AuthService {
     @Transactional
     public void logout(Long userId) {
         refreshTokenRepository.deleteByUserId(userId);
+        SecurityContextHolder.clearContext();
         log.info("로그아웃: userId={}", userId);
     }
 }
