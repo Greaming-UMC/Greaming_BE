@@ -22,17 +22,17 @@ public class Provider extends BaseEntity {
     @Column(name = "name", length = 20, nullable = false)
     private String name;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     @Column(name = "nickname", length = 100, nullable = false)
     private String nickname;
 
     @Column(name = "email", length = 255, nullable = false)
     private String email;
 
-    // 연관관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Long getUserId() {
+        return user != null ? user.getUserId() : null;
+    }
 }

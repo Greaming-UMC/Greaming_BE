@@ -85,7 +85,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private void createProvider(String registrationId, OAuth2UserInfo userInfo, User user) {
         Provider provider = Provider.builder()
                 .name(registrationId)
-                .userId(user.getUserId())
+                .user(user)
                 .nickname(userInfo.getName())
                 .email(userInfo.getEmail())
                 .build();

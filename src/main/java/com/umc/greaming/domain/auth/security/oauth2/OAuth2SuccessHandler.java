@@ -1,6 +1,8 @@
 package com.umc.greaming.domain.auth.security.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.umc.greaming.common.response.ApiResponse;
+import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.auth.dto.response.LoginResponse;
 import com.umc.greaming.domain.auth.security.JwtTokenProvider;
 import com.umc.greaming.domain.auth.service.AuthService;
@@ -15,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -54,16 +54,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setStatus(HttpServletResponse.SC_OK);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("isSuccess", true);
-        body.put("code", "AUTH_200");
-        body.put("message", "로그인 성공");
-        body.put("result", LoginResponse.of(
+        LoginResponse loginResponse = LoginResponse.of(
                 accessToken,
                 jwtTokenProvider.getAccessTokenExpiration(),
                 oAuth2User.isNewUser()
-        ));
+        );
 
-        objectMapper.writeValue(response.getWriter(), body);
+        ApiResponse<LoginResponse> apiResponse = new ApiResponse<>(
+                true,
+                SuccessStatus.LOGIN_SUCCESS.getCode(),
+                SuccessStatus.LOGIN_SUCCESS.getMessage(),
+                loginResponse
+        );
+
+        objectMapper.writeValue(response.getWriter(), apiResponse);
     }
 }
