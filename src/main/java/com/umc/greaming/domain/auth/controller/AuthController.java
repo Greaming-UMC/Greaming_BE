@@ -79,17 +79,11 @@ public class AuthController {
      *
      * @param userId 현재 인증된 사용자의 ID (Spring Security에서 자동 주입)
      * @return 로그아웃 성공 응답
-     * @throws GeneralException 인증 정보가 없는 경우 (UNAUTHORIZED)
      */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal Long userId
     ) {
-        // Spring Security 필터를 통과했음에도 userId가 null인 경우 (비정상 상황)
-        if (userId == null) {
-            throw new GeneralException(ErrorStatus.UNAUTHORIZED);
-        }
-
         authService.logout(userId);
         return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
     }
