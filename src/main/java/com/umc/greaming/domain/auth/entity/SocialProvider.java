@@ -21,8 +21,4 @@ public enum SocialProvider {
                 .findFirst()
                 .orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_SOCIAL_PROVIDER));
     }
-
-    public String getValue() {
-        return value;
-    }
 }
