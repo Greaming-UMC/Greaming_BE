@@ -36,7 +36,7 @@ public class User extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "profile_image_url")
+    @Column(name="profile_image_url")
     private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)

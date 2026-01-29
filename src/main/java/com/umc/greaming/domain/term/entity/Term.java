@@ -1,22 +1,22 @@
-package com.umc.greaming.domain.tag.entity;
+package com.umc.greaming.domain.term.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "terms")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Tag extends BaseEntity {
+public class Term extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tag_id")
+    @Column(name = "term_id")
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String name;
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
 }
