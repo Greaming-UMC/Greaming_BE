@@ -3,8 +3,8 @@ package com.umc.greaming.domain.submission.controller;
 import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
-import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
+import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/submissions")
 public class SubmissionController {
 
-    private final SubmissionQueryService submissionQueryService;
+    private final SubmissionQueryService submissionService;
 
     @GetMapping("/{submissionId}/preview")
     public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(@PathVariable @Positive Long submissionId) {
-        SubmissionPreviewResponse result = submissionQueryService.getSubmissionPreview(submissionId);
+        SubmissionPreviewResponse result = submissionService.getSubmissionPreview(submissionId);
         return ApiResponse.success(SuccessStatus.SUBMISSION_PREVIEW_SUCCESS, result);
     }
 
@@ -29,9 +29,8 @@ public class SubmissionController {
     public ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
             @PathVariable @Positive Long submissionId,
             @RequestParam(defaultValue = "1") @Positive int page
-            //,@AuthenticationPrincipal UserDetails userDetails
     ) {
-        SubmissionDetailResponse result = submissionQueryService.getSubmissionDetail(submissionId, page);
+        SubmissionDetailResponse result = submissionService.getSubmissionDetail(submissionId, page);
         return ApiResponse.success(SuccessStatus.SUBMISSION_DETAIL_SUCCESS, result);
     }
 
@@ -39,9 +38,9 @@ public class SubmissionController {
     public ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
             @PathVariable @Positive Long submissionId,
             @RequestBody SubmissionUpdateRequest updateSubmission
-            //,@AuthenticationPrincipal UserDetails userDetails
-            ) {
-        SubmissionInfo result = submissionQueryService.updateSubmission(submissionId, updateSubmission);
+    ) {
+        Long userId = 1L;
+        SubmissionInfo result = submissionService.updateSubmission(submissionId, updateSubmission, userId);
         return ApiResponse.success(SuccessStatus.SUBMISSION_UPDATE, result);
     }
 }
