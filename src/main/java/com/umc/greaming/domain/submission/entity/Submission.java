@@ -76,4 +76,22 @@ public class Submission extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public void update(String title, String caption, SubmissionVisibility visibility, Boolean commentEnabled, String thumbnailUrl) {
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+        if (caption != null) {
+            this.caption = caption;
+        }
+        if (visibility != null) {
+            this.visibility = visibility;
+        }
+        if (commentEnabled != null) {
+            this.commentEnabled = commentEnabled;
+        }
+        if (thumbnailUrl != null && !thumbnailUrl.isBlank()) {
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
 }

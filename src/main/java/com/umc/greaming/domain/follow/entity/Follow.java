@@ -11,7 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "follow")
+@Table(name = "follows")
 public class Follow extends BaseEntity {
 
     @Id
