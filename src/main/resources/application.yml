@@ -3,8 +3,8 @@ spring:
     name: greaming
 
   # 프로필 설정
-  profiles:
-    active: local
+  config:
+    import: optional:classpath:application-local.yml
 
   jpa:
     open-in-view: false
@@ -28,3 +28,16 @@ jwt:
 # OAuth2 리다이렉트 설정
 oauth2:
   redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth/callback}
+  # AWS S3 설정
+  cloud:
+    aws:
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: greaming-bucket
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+swagger:
+  url: http://localhost:8080
