@@ -2,13 +2,14 @@ package com.umc.greaming.domain.submission.controller;
 
 import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.common.status.success.SuccessStatus;
+import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
 import com.umc.greaming.domain.submission.service.SubmissionCommandService;
 import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
-import com.umc.greaming.domain.submission.service.SubmissionQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,21 +22,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/api/submissions")
-public class SubmissionController {
+public class SubmissionController implements SubmissionApi {
 
     private final SubmissionQueryService submissionQueryService;
     private final SubmissionCommandService submissionCommandService;
 
     @GetMapping("/{submissionId}/preview")
-    public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(@PathVariable @Positive Long submissionId) {
+    public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(@PathVariable Long submissionId) {
         SubmissionPreviewResponse result = submissionQueryService.getSubmissionPreview(submissionId);
         return ApiResponse.success(SuccessStatus.SUBMISSION_PREVIEW_SUCCESS, result);
     }
 
     @GetMapping("/{submissionId}")
     public ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
-            @PathVariable @Positive Long submissionId,
-            @RequestParam(defaultValue = "1") @Positive int page
+            @PathVariable Long submissionId,
+            @RequestParam(defaultValue = "1") int page
             //,@AuthenticationPrincipal UserDetails userDetails
     ) {
         SubmissionDetailResponse result = submissionQueryService.getSubmissionDetail(submissionId, page);
@@ -44,7 +45,7 @@ public class SubmissionController {
 
     @PutMapping("/{submissionId}")
     public ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
-            @PathVariable @Positive Long submissionId,
+            @PathVariable Long submissionId,
             @RequestBody SubmissionUpdateRequest updateSubmission
             //,@AuthenticationPrincipal UserDetails userDetails
             ) {
@@ -53,8 +54,16 @@ public class SubmissionController {
     }
 
     @DeleteMapping("/{submissionId}")
-    public ResponseEntity<ApiResponse<Long>> deleteSubmission(@PathVariable @Positive Long submissionId) {
+    public ResponseEntity<ApiResponse<Long>> deleteSubmission(@PathVariable Long submissionId) {
         submissionCommandService.deleteSubmission(submissionId); //userId 추가필요
         return ApiResponse.success(SuccessStatus.SUBMISSION_DELETED, submissionId);
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<SubmissionInfo>> createSubmission(
+            @RequestBody SubmissionCreateRequest request
+    ) {
+        SubmissionInfo result = submissionCommandService.createSubmission(request);
+        return ApiResponse.success(SuccessStatus.SUBMISSION_CREATED, result);
     }
 }
