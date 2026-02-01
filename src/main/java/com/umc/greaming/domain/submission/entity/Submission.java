@@ -1,6 +1,8 @@
 package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
+import com.umc.greaming.domain.challenge.entity.Challenge;
+import com.umc.greaming.domain.circle.entity.Circle;
 import com.umc.greaming.domain.submission.enums.SubmissionField;
 import com.umc.greaming.domain.submission.enums.SubmissionVisibility;
 import com.umc.greaming.domain.user.entity.User;
@@ -30,7 +32,6 @@ public class Submission extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-/*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
@@ -38,7 +39,7 @@ public class Submission extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "circle_id")
     private Circle circle;
-*/
+
 
     @Column(name = "title", nullable = false)
     private String title;

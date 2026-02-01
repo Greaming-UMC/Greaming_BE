@@ -35,6 +35,7 @@ public enum SuccessStatus implements BaseStatus {
     SUBMISSION_DETAIL_SUCCESS("SUBMISSION_200", HttpStatus.OK, "게시물 상세조회 성공"),
     SUBMISSION_UPDATE("SUBMISSION_200", HttpStatus.OK , "게시물 수정 성공" ),
     SUBMISSION_DELETED("SUBMISSION_200", HttpStatus.OK , "게시물 삭제 성공" ),
+    SUBMISSION_CREATED("SUBMISSION_200", HttpStatus.OK , "게시물 추가 성공" ),
 
     // user
     USER_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "내 프로필 화면 조회 성공"),
