@@ -22,6 +22,7 @@ public class SubmissionCommandService {
     private final SubmissionRepository submissionRepository;
     private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
+    private final SubmissionTagRepository submissionTagRepository;
 
     public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request){ //, Long userId) {
 

@@ -7,6 +7,8 @@ import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Submission extends BaseEntity {
 
     @Id
