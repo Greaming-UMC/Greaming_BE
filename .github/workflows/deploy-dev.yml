@@ -20,41 +20,49 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # 빌드
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      # 도커 이미지 빌드 & 푸시
       - name: Docker Build & Push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t ${{ secrets.DOCKER_REPO }} .
-          docker push ${{ secrets.DOCKER_REPO }}
+          docker build -t ${{ secrets.DOCKER_REPO }}:latest -t ${{ secrets.DOCKER_REPO }}:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_REPO }}:latest
+          docker push ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
 
-      # 3. EC2 접속 & 배포 실행
       - name: Deploy to Dev Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
-          script: |
+          script: |      
             sudo docker stop greaming-dev || true
             sudo docker rm greaming-dev || true
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:latest
             
-            sudo docker pull ${{ secrets.DOCKER_REPO }}
+            rm -f .env
             
-            # 개발 서버 실행
+            echo "SERVER_PORT=8081" >> .env
+            echo "TZ=Asia/Seoul" >> .env
+            echo "SPRING_PROFILES_ACTIVE=dev" >> .env
+            echo "SPRING_DATASOURCE_URL=${{ secrets.DEV_DB_URL }}" >> .env
+            echo "SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}" >> .env
+            echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+            echo "OAUTH2_GOOGLE_CLIENT_ID=${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}" >> .env
+            echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env
+            echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env
+            echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env
+            echo "OAUTH2_REDIRECT_URI=http://${{ secrets.EC2_HOST }}:8081/oauth/callback" >> .env
+            echo "SWAGGER_URL=http://${{ secrets.EC2_HOST }}:8081" >> .env
+
             sudo docker run -d -p 8081:8081 --name greaming-dev \
-            -e TZ=Asia/Seoul \
-            -e SPRING_PROFILES_ACTIVE=dev \
-            -e SPRING_DATASOURCE_URL="${{ secrets.DEV_DB_URL }}" \
-            -e SPRING_DATASOURCE_USERNAME="${{ secrets.RDS_USERNAME }}" \
-            -e SPRING_DATASOURCE_PASSWORD="${{ secrets.RDS_PASSWORD }}" \
-            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            ${{ secrets.DOCKER_REPO }}
+            --env-file .env \
+            ${{ secrets.DOCKER_REPO }}:latest
             
             sudo docker image prune -f
