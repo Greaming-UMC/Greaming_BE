@@ -6,34 +6,68 @@
 # ===================================================================
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   config:
     activate:
-      on-profile: local # 로컬 프로필 활성화
+      on-profile: local
 
   datasource:
-    # [1] 로컬 DB 주소 (MySQL 기준)
-    # 뒤에 /greaming_local 부분은 본인이 로컬에 만든 DB 이름으로 수정 가능
-    url: jdbc:mysql://localhost:3306/greaming_local?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-
-    # [2] 로컬 DB 계정 정보 (본인 설치 환경에 맞게 수정)
-    username: root
-    password: your_password_here # 여기에 본인 DB 비밀번호 입력
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update # 로컬에서는 편하게 update 또는 create 사용
-    show-sql: true # 쿼리 로그 출력
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${OAUTH2_KAKAO_CLIENT_ID}
+            client-secret: ${OAUTH2_KAKAO_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            scope:
+              - profile_nickname
+              - account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+
+swagger:
+  url: http://localhost:8080
+
 
 # ===================================================================
 # [참고] 로컬 실행 시 주의사항 (MySQL을 PC에 설치하지 않은 경우)
 # - Docker가 켜져 있어야 DB 접속이 가능한 경우, Docker를 먼저 실행하세요.
 # - 프로젝트 실행 시 Active Profile이 'local'로 잡히는지 확인하세요.
+# - [구성 편집] 창에서 EnvFile 플러그인이 실행되고 있는지 + .env 파일이 플러그인에 잡히는지 확인하세요.
 # ===================================================================
