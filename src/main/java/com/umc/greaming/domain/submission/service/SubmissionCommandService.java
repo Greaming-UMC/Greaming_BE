@@ -3,6 +3,7 @@ package com.umc.greaming.domain.submission.service;
 import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
+import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
@@ -31,8 +32,9 @@ public class SubmissionCommandService {
     private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
     private final SubmissionTagRepository submissionTagRepository;
-    private final TagRepository tagRepository; // 태그 자체를 조회/저장하기 위해 필요
+    private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request){ //, Long userId) {
 
@@ -50,10 +52,15 @@ public class SubmissionCommandService {
             submission.setCaption(request.caption());
         }
 
-        List<String> currentImages = request.imageList();
+        List<String> currentImageUrls = request.imageList().stream()
+                .map(s3Service::getPublicUrl)
+                .toList();
+
         List<String> currentTags = request.tags();
 
-        return SubmissionInfo.from(submission, currentImages, currentTags, false);
+        String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+
+        return SubmissionInfo.from(submission, profileImageUrl, currentImageUrls, currentTags, false);
     }
 
     public void deleteSubmission(Long submissionId) {
@@ -72,6 +79,7 @@ public class SubmissionCommandService {
     public SubmissionInfo createSubmission(SubmissionCreateRequest request) {
 
         Long userId = 1L;
+
         User user = userRepository.getReferenceById(userId);
 
         Submission submission = Submission.builder()
@@ -80,10 +88,8 @@ public class SubmissionCommandService {
                 .caption(request.caption())
                 .visibility(request.visibility())
                 .commentEnabled(request.commentEnabled())
-
                 .field(request.field())
-                .thumbnailUrl(request.thumbnailUrl())
-
+                .thumbnailKey(request.thumbnailKey())
                 .build();
 
         submissionRepository.save(submission);
@@ -92,7 +98,7 @@ public class SubmissionCommandService {
             List<SubmissionImage> images = IntStream.range(0, request.imageList().size())
                     .mapToObj(i -> SubmissionImage.builder()
                             .submission(submission)
-                            .imageUrl(request.imageList().get(i))
+                            .imageKey(request.imageList().get(i))
                             .sortOrder(i)
                             .build())
                     .toList();
@@ -110,6 +116,12 @@ public class SubmissionCommandService {
             }
         }
 
-        return SubmissionInfo.from(submission, request.imageList(), request.tags(), false);
+        List<String> imageUrls = request.imageList() != null
+                ? request.imageList().stream().map(s3Service::getPublicUrl).toList()
+                : List.of();
+
+        String profileImageUrl = s3Service.getPublicUrl(user.getProfileImageKey());
+
+        return SubmissionInfo.from(submission, profileImageUrl, imageUrls, request.tags(), false);
     }
 }
