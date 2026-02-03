@@ -19,15 +19,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-# JWT 설정
-jwt:
-  secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-at-least-32-characters}
-  access-token-expiration: 3600000      # 1시간 (ms)
-  refresh-token-expiration: 604800000   # 7일 (ms)
-
-# OAuth2 리다이렉트 설정
-oauth2:
-  redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth/callback}
   # AWS S3 설정
   cloud:
     aws:
@@ -38,6 +29,16 @@ oauth2:
       credentials:
         access-key: ${AWS_ACCESS_KEY_ID}
         secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000      # 1시간 (ms)
+  refresh-token-expiration: 604800000   # 7일 (ms)
+
+# OAuth2 리다이렉트 설정
+oauth2:
+  redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth/callback}
 
 swagger:
   url: http://localhost:8080
