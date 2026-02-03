@@ -2,6 +2,7 @@ package com.umc.greaming.domain.user.service;
 
 import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
+import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.follow.enums.FollowState;
 import com.umc.greaming.domain.follow.repository.FollowRepository;
 import com.umc.greaming.domain.tag.repository.UserInterestTagRepository;
@@ -24,6 +25,7 @@ public class UserQueryService {
     private final FollowRepository followRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
+    private final S3Service s3Service;
 
     public MyProfileTopResponse getMyProfileTop(Long userId) {
         User user = userRepository.findById(userId)
@@ -40,10 +42,12 @@ public class UserQueryService {
         List<String> dailyChallenge = List.of();
         List<String> weeklyChallenge = List.of();
 
+        String profileImgUrl = resolvePublicUrl(user.getProfileImageKey());
+
         return MyProfileTopResponse.builder()
                 .userInformation(MyProfileTopResponse.UserInformation.builder()
                         .nickname(user.getNickname())
-                        .profileImgUrl(user.getProfileImageUrl())
+                        .profileImgUrl(profileImgUrl)
                         .level(level)
                         .introduction(user.getIntroduction())
                         .followerCount(followerCount)
@@ -56,5 +60,12 @@ public class UserQueryService {
                         .weeklyChallenge(weeklyChallenge)
                         .build())
                 .build();
+    }
+
+    private String resolvePublicUrl(String key) {
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+        return s3Service.getPublicUrl(key);
     }
 }
