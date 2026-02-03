@@ -40,12 +40,11 @@ public class Submission extends BaseEntity {
     @JoinColumn(name = "circle_id")
     private Circle circle;
 
-
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "thumbnail_url", nullable = false)
-    private String thumbnailUrl;
+    @Column(name = "thumbnail_key", nullable = false)
+    private String thumbnailKey;
 
     @Column(name = "caption", columnDefinition = "TEXT")
     private String caption;

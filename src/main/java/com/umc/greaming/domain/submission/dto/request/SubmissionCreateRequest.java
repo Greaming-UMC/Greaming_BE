@@ -21,16 +21,19 @@ public record SubmissionCreateRequest(
 
         @Schema(description = "작품 분야 (IL, WEBTOON 등)", example = "IL")
         @NotNull(message = "분야(field)는 필수입니다.")
-        SubmissionField field, // 👈 [1] 아까 누락된 필드 추가
+        SubmissionField field,
 
-        @Schema(description = "썸네일 이미지 URL (압축된 버전)", example = "https://s3.../thumb_1.jpg")
+        @Schema(description = "썸네일 이미지 S3 Key (URL 아님)", example = "submissions/user1/thumb_uuid.jpg")
         @NotBlank(message = "썸네일 이미지는 필수입니다.")
-        String thumbnailUrl,   // 👈 [2] 썸네일 URL을 따로 받음
+        String thumbnailKey,
 
         @Schema(description = "댓글 허용 여부", example = "true")
         boolean commentEnabled,
 
+        @Schema(description = "태그 목록 (최대 6개 권장)", example = "[\"일러스트\", \"배경\", \"캐릭터\"]")
         List<String> tags,
+
+        @Schema(description = "본문 이미지 S3 Key 목록", example = "[\"submissions/user1/img1.jpg\", \"submissions/user1/img2.jpg\"]")
         List<String> imageList
 ) {
 }
