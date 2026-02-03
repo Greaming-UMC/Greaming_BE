@@ -19,7 +19,7 @@ public record CommentInfo(
     public static CommentInfo from(Comment comment) {
         return new CommentInfo(
                 comment.getUser().getNickname(),
-                comment.getUser().getProfileImageUrl(),
+                comment.getUser().getProfileImageKey(),
                 comment.getContent(),
                 false // 좋아요
         );

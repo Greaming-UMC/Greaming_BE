@@ -4,11 +4,11 @@ import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
+import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
 import com.umc.greaming.domain.submission.entity.Submission;
-import com.umc.greaming.domain.submission.entity.SubmissionImage;
 import com.umc.greaming.domain.submission.repository.SubmissionImageRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionTagRepository;
@@ -30,14 +30,23 @@ public class SubmissionQueryService {
     private final SubmissionTagRepository submissionTagRepository;
     private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
+    private final S3Service s3Service;
     private static final int PAGE_SIZE = 30;
+
+    private Submission findSubmissionByIdOrThrow(Long submissionId) {
+        return submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+    }
 
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
 
-        return SubmissionPreviewResponse.from(submission, tags);
+        String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
+
+        return SubmissionPreviewResponse.from(submission, thumbnailUrl, tags);
     }
+
     public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission);
@@ -56,19 +65,17 @@ public class SubmissionQueryService {
     private SubmissionInfo createSubmissionInfoFromEntity(Submission submission) {
         Long submissionId = submission.getId();
 
-        List<String> sortedImages = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
+        List<String> sortedImageUrls = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
                 .stream()
-                .map(SubmissionImage::getImageUrl)
+                .map(image -> s3Service.getPublicUrl(image.getImageKey()))
                 .toList();
 
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
 
+        String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+
         boolean isLiked = false;
 
-        return SubmissionInfo.from(submission, sortedImages, tags, isLiked);
-    }
-    private Submission findSubmissionByIdOrThrow(Long submissionId) {
-        return submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+        return SubmissionInfo.from(submission, profileImageUrl, sortedImageUrls, tags, isLiked);
     }
 }

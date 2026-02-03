@@ -7,10 +7,10 @@ import lombok.*;
 @Entity
 @Table(name = "submission_images",
         uniqueConstraints = {
-            @UniqueConstraint(
-                name = "uk_submission_id_sort_order",
-                columnNames = {"submission_id", "sort_order"}
-            )
+                @UniqueConstraint(
+                        name = "uk_submission_id_sort_order",
+                        columnNames = {"submission_id", "sort_order"}
+                )
         })
 @Getter
 @Builder
@@ -27,8 +27,8 @@ public class SubmissionImage extends BaseEntity {
     @JoinColumn(name = "submission_id", nullable = false)
     private Submission submission;
 
-    @Column(nullable = false)
-    private String imageUrl;
+    @Column(name = "image_key", nullable = false)
+    private String imageKey;
 
     @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer sortOrder;
