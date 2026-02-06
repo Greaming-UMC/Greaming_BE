@@ -3,8 +3,8 @@ package com.umc.greaming.domain.auth.security.oauth2;
 import com.umc.greaming.domain.auth.entity.Provider;
 import com.umc.greaming.domain.auth.repository.ProviderRepository;
 import com.umc.greaming.domain.user.entity.User;
-import com.umc.greaming.domain.user.entity.enums.UserState;
-import com.umc.greaming.domain.user.entity.enums.Visibility;
+import com.umc.greaming.domain.user.enums.UserStatus;
+import com.umc.greaming.domain.user.enums.Visibility;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,8 +74,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = User.builder()
                 .name(userInfo.getName())
                 .nickname(generateUniqueNickname())
-                .profileImageUrl(userInfo.getProfileImageUrl())
-                .userState(UserState.ACTIVE)
+                .profileImageKey(userInfo.getProfileImageUrl())
+                .userState(UserStatus.ACTIVE)
                 .visibility(Visibility.PUBLIC)
                 .build();
 

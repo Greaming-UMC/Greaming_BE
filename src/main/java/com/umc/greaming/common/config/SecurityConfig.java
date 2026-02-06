@@ -26,18 +26,23 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final OAuth2Config oAuth2Config;
 
-    private final String[] PUBLIC_URLS = {
+    private static final String[] PUBLIC_URLS = {
             "/api/auth/login/**",
             "/api/auth/reissue",
             "/oauth2/**",
             "/login/oauth2/**",
             "/h2-console/**",
-            "/api/works/**"
+            "/api/works/**",
+
+            //swagger
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        HttpSecurity httpSecurity = http
+        http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -47,13 +52,8 @@ public class SecurityConfig {
                         exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                PUBLIC_URLS
-                        ).permitAll()
-                        .requestMatchers(
-                                "/actuator/**"
-                        )
-                        .hasRole("ADMIN")
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oAuth2Config::configure)

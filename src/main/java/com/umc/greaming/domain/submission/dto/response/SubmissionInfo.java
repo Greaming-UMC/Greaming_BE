@@ -28,7 +28,7 @@ public record SubmissionInfo(
     public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<String> tags, boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
-                submission.getUser().getProfileImageUrl(),
+                submission.getUser().getProfileImageKey(),
                 "Painter", // 레벨
                 sortedImages,
                 submission.getLikeCount(),
