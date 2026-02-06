@@ -1,10 +1,8 @@
-name: CI (Build & Test Check)
+name: CI (Test Check)
 
 on:
-  push:
-    branches-ignore: [ "main", "develop" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "develop", "main" ]
 
 permissions:
   contents: read
@@ -22,7 +20,21 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # 테스트 실행
+      - name: Create Dummy .env for Test
+        run: |
+          echo "SERVER_PORT=8080" > .env
+          echo "JWT_SECRET=test_secret_key_must_be_long_enough_for_security_checks" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_ID=test_id" >> .env
+          echo "OAUTH2_GOOGLE_CLIENT_SECRET=test_secret" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_ID=test_id" >> .env
+          echo "OAUTH2_KAKAO_CLIENT_SECRET=test_secret" >> .env
+          echo "OAUTH2_REDIRECT_URI=http://localhost:3000" >> .env
+          echo "AWS_ACCESS_KEY_ID=test_key" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=test_secret" >> .env
+          echo "SPRING_DATASOURCE_URL=jdbc:h2:mem:test" >> .env
+          echo "SPRING_DATASOURCE_USERNAME=sa" >> .env
+          echo "SPRING_DATASOURCE_PASSWORD=" >> .env
+
       - name: Run Test with Gradle
         run: |
           chmod +x gradlew
