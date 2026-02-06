@@ -31,8 +31,8 @@ public class UserQueryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        long followerCount = followRepository.countByFollowing_IdAndState(userId, FollowState.COMPLETED);
-        long followingCount = followRepository.countByFollower_IdAndState(userId, FollowState.COMPLETED);
+        long followerCount = followRepository.countByFollowing_UserIdAndState(userId, FollowState.COMPLETED);
+        long followingCount = followRepository.countByFollower_UserIdAndState(userId, FollowState.COMPLETED);
 
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
         List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
