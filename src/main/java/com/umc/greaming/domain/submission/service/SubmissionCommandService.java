@@ -2,6 +2,8 @@ package com.umc.greaming.domain.submission.service;
 
 import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
+import com.umc.greaming.domain.challenge.enums.JourneyLevel; // [추가]
+import com.umc.greaming.domain.challenge.repository.WeeklyUserScoreRepository; // [추가]
 import com.umc.greaming.domain.comment.repository.CommentRepository;
 import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
@@ -28,23 +30,27 @@ import java.util.stream.IntStream;
 @Transactional
 @RequiredArgsConstructor
 public class SubmissionCommandService {
+
     private final SubmissionRepository submissionRepository;
     private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
     private final SubmissionTagRepository submissionTagRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final WeeklyUserScoreRepository weeklyUserScoreRepository; // [추가] 레벨 조회를 위해 필요
     private final S3Service s3Service;
 
-    public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request){ //, Long userId) {
+    // [수정] User 파라미터 추가
+    public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request, User user) {
 
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
-    /*
-        if (!submission.getUser().getId().equals(userId)) {
-            throw new GeneralException(ErrorStatus.FORBIDDEN);
+
+        // [수정] 권한 검증 로직 활성화 (작성자 본인인지 확인)
+        if (!submission.getUser().getId().equals(user.getId())) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN); // 에러 상태 코드는 프로젝트 정의에 맞게 확인
         }
-    */
+
         if (request.title() != null) {
             submission.setTitle(request.title());
         }
@@ -52,6 +58,7 @@ public class SubmissionCommandService {
             submission.setCaption(request.caption());
         }
 
+        // 이미지와 태그 업데이트 로직은 기존 코드 유지 (실제 DB 반영 로직은 생략된 상태로 보임)
         List<String> currentImageUrls = request.imageList().stream()
                 .map(s3Service::getPublicUrl)
                 .toList();
@@ -60,36 +67,42 @@ public class SubmissionCommandService {
 
         String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
 
-        return SubmissionInfo.from(submission, profileImageUrl, currentImageUrls, currentTags, false);
+        // [추가] 레벨 조회 로직
+        String level = getLevelBySubmission(submission);
+
+        // [수정] DTO 변경에 맞춰 level, isLiked 전달 (본인이 수정 중이므로 좋아요 여부는 false 혹은 별도 조회 필요)
+        // 여기서는 false로 두거나, 필요 시 Repository 조회
+        return SubmissionInfo.from(submission, profileImageUrl, level, currentImageUrls, currentTags, false);
     }
 
-    public void deleteSubmission(Long submissionId) {
+    // [수정] User 파라미터 추가
+    public void deleteSubmission(Long submissionId, User user) {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
 
-        /*
-        if (!submission.getUser().getId().equals(userId)) {
+        // [수정] 권한 검증 로직 활성화
+        if (!submission.getUser().getId().equals(user.getId())) {
             throw new GeneralException(ErrorStatus.SUBMISSION_NOT_AUTHORIZED);
         }
-        */
 
         submissionRepository.softDeleteById(submissionId);
     }
 
-    public SubmissionInfo createSubmission(SubmissionCreateRequest request) {
+    // [수정] User 파라미터 추가
+    public SubmissionInfo createSubmission(SubmissionCreateRequest request, User user) {
 
-        Long userId = 1L;
+        // [삭제] 하드코딩 제거 (Long userId = 1L;)
 
-        User user = userRepository.getReferenceById(userId);
-
+        // [수정] 전달받은 user 객체 사용
         Submission submission = Submission.builder()
-                .user(user)
+                .user(user) // 파라미터로 받은 user 사용
                 .title(request.title())
                 .caption(request.caption())
                 .visibility(request.visibility())
                 .commentEnabled(request.commentEnabled())
                 .field(request.field())
                 .thumbnailKey(request.thumbnailKey())
+                // .challenge(...) // 챌린지 정보가 Request에 있다면 여기서 설정 필요
                 .build();
 
         submissionRepository.save(submission);
@@ -122,6 +135,21 @@ public class SubmissionCommandService {
 
         String profileImageUrl = s3Service.getPublicUrl(user.getProfileImageKey());
 
-        return SubmissionInfo.from(submission, profileImageUrl, imageUrls, request.tags(), false);
+        // [추가] 레벨 조회 (신규 생성 시 챌린지가 있다면 해당 챌린지 점수 조회)
+        String level = getLevelBySubmission(submission);
+
+        // [수정] DTO 규격에 맞춰 반환
+        return SubmissionInfo.from(submission, profileImageUrl, level, imageUrls, request.tags(), false);
+    }
+
+    // [Helper] 레벨 조회 중복 코드 분리
+    private String getLevelBySubmission(Submission submission) {
+        // Submission에 Challenge가 연결되어 있지 않을 경우 대비 (null safe)
+        if (submission.getChallenge() == null) {
+            return JourneyLevel.SKETCHER.name();
+        }
+        return weeklyUserScoreRepository.findByUserAndChallenge(submission.getUser(), submission.getChallenge())
+                .map(score -> score.getJourneyLevel().name())
+                .orElse(JourneyLevel.SKETCHER.name());
     }
 }

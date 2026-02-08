@@ -51,13 +51,14 @@ public record SubmissionInfo(
     public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<TagInfo> tags, boolean isLiked) {
     public static SubmissionInfo from(Submission submission,
                                       String profileImageUrl,
+                                      String level,
                                       List<String> sortedImages,
                                       List<String> tags,
                                       boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
                 profileImageUrl,
-                "Painter",
+                level,
                 sortedImages,
                 submission.getLikeCount(),
                 submission.getCommentCount(),

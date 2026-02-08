@@ -15,13 +15,13 @@ public record CommentInfo(
         @JsonProperty("isLiked")
         Boolean isLiked
 ) {
-    // 엔티티 -> DTO 변환 로직
-    public static CommentInfo from(Comment comment) {
+    // [수정] 외부에서 변환된 URL과 좋아요 여부를 파라미터로 받음
+    public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked) {
         return new CommentInfo(
                 comment.getUser().getNickname(),
-                comment.getUser().getProfileImageKey(),
+                profileUrl, // S3 URL (Service에서 변환해서 넘겨줌)
                 comment.getContent(),
-                false // 좋아요
+                isLiked     // 좋아요 여부 (Service에서 조회해서 넘겨줌)
         );
     }
 }

@@ -34,7 +34,7 @@ public enum ErrorStatus implements BaseStatus {
 
     //작품 미리보기
     SUBMISSION_NOT_FOUND("SUBMISSION_404", HttpStatus.NOT_FOUND, "작품을 찾을 수 없습니다."),
-
+    SUBMISSION_NOT_AUTHORIZED("SUBMISSION_401", HttpStatus.UNAUTHORIZED, "올바른 사용자가 아닙니다."),
     //s3
     S3_UPLOAD_FAILED("S3_500", HttpStatus.INTERNAL_SERVER_ERROR, "Presigned URL 발급에 실패했습니다.");
 
