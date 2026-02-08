@@ -2,6 +2,7 @@ package com.umc.greaming.domain.submission.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.umc.greaming.domain.submission.entity.Submission;
+import com.umc.greaming.domain.tag.dto.TagInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,17 +20,16 @@ public record SubmissionInfo(
 
         String title,
         String caption,
-        List<String> tags,
+        List<TagInfo> tags,
         Boolean liked,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime uploadAt
 ) {
-    // 엔티티 -> DTO 변환 로직을 여기로 이동 (응집도 향상)
-    public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<String> tags, boolean isLiked) {
+    public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<TagInfo> tags, boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
                 submission.getUser().getProfileImageUrl(),
-                "Painter", // 레벨
+                "Painter",
                 sortedImages,
                 submission.getLikeCount(),
                 submission.getCommentCount(),
