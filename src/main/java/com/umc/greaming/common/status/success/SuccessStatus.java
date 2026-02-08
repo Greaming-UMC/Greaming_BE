@@ -33,10 +33,11 @@ public enum SuccessStatus implements BaseStatus {
     //작품 미리보기
     SUBMISSION_PREVIEW_SUCCESS("SUBMISSION_200", HttpStatus.OK, "작품 미리보기 조회 성공"),
     SUBMISSION_DETAIL_SUCCESS("SUBMISSION_200", HttpStatus.OK, "작품 상세조회 성공"),
+    SUBMISSION_UPDATE("SUBMISSION_200", HttpStatus.OK , "작품 수정 성공" ),
 
     //s3
     S3_UPLOAD_SUCCESS("S3_200", HttpStatus.OK, "Presigned URL 발급 성공");
-    
+
 
     private final String code;
     private final HttpStatus httpStatus;

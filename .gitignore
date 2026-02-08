@@ -42,5 +42,6 @@ out/
 application-local.yml
 src/main/resources/application-local.yml
 
-### Environment Variables ###
+### 환경변수 설정 (.env) ###
 .env
+.env.*
