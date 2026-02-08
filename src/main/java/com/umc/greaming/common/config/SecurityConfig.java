@@ -2,8 +2,6 @@ package com.umc.greaming.common.config;
 
 import com.umc.greaming.domain.auth.security.JwtAuthenticationEntryPoint;
 import com.umc.greaming.domain.auth.security.JwtAuthenticationFilter;
-import com.umc.greaming.domain.auth.security.oauth2.CustomOAuth2UserService;
-import com.umc.greaming.domain.auth.security.oauth2.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +18,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final OAuth2Config oAuth2Config;
 
     private final String[] PUBLIC_URLS = {
-            "/api/auth/login/**",
+            "/api/auth/login",
             "/api/auth/reissue",
             "/oauth2/**",
             "/login/oauth2/**",
