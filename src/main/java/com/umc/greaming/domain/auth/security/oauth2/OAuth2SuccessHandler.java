@@ -1,7 +1,7 @@
 package com.umc.greaming.domain.auth.security.oauth2;
 
+import com.umc.greaming.common.config.CookieConfig;
 import com.umc.greaming.domain.auth.service.AuthService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-    private static final int REFRESH_TOKEN_COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7일 (초 단위)
-
     private final AuthService authService;
+    private final CookieConfig cookieConfig;
 
     @Value("${oauth2.redirect-uri}")
     private String frontendRedirectUri;
@@ -42,12 +40,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("OAuth2 로그인 성공: userId={}, isNewUser={}", userId, oAuth2User.isNewUser());
 
         // 리프레시 토큰은 HttpOnly 쿠키로 설정
-        Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_COOKIE_MAX_AGE);
-        response.addCookie(refreshTokenCookie);
+        cookieConfig.addRefreshTokenCookie(response, request, refreshToken);
 
         // 프론트엔드로 리다이렉트 (is_new_user만 쿼리 파라미터로 전달)
         // 프론트에서 /api/auth/reissue를 호출하여 액세스 토큰을 발급받아야 함

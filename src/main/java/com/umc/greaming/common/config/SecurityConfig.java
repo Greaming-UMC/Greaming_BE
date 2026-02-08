@@ -23,7 +23,6 @@ public class SecurityConfig {
     private final OAuth2Config oAuth2Config;
 
     private final String[] PUBLIC_URLS = {
-            "/api/auth/login",
             "/api/auth/reissue",
             "/oauth2/**",
             "/login/oauth2/**",
