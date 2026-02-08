@@ -74,7 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = User.builder()
                 .name(userInfo.getName())
                 .nickname(generateUniqueNickname())
-                .profileImageUrl(userInfo.getProfileImageUrl())
+                .profileImageKey(userInfo.getProfileImageUrl())
                 .userState(UserState.ACTIVE)
                 .visibility(Visibility.PUBLIC)
                 .build();

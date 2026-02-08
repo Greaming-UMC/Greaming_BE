@@ -1,7 +1,7 @@
 package com.umc.greaming.domain.submission.controller;
 
 import com.umc.greaming.common.response.ApiResponse;
-import com.umc.greaming.domain.comment.dto.response.CommentPageResponse; // [추가]
+import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
@@ -18,7 +18,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,7 +43,7 @@ public interface SubmissionApi {
     })
     ResponseEntity<ApiResponse<SubmissionInfo>> createSubmission(
             @RequestBody @Valid SubmissionCreateRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
     );
 
     @Operation(summary = "게시글 미리보기 조회", description = "게시글 ID를 통해 미리보기 정보를 조회합니다.")
@@ -84,10 +83,9 @@ public interface SubmissionApi {
     ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
             @Parameter(description = "게시글 ID") @Positive Long submissionId,
             @Parameter(description = "페이지 번호 (1부터 시작)") @RequestParam(defaultValue = "1") @Positive int page,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
     );
 
-    // ▼▼▼ [신규 추가] 댓글만 따로 조회하는 API ▼▼▼
     @Operation(summary = "댓글 목록 조회 (페이징)", description = "게시글의 댓글만 따로 조회합니다. (스크롤/더보기 기능용)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공"),
@@ -148,7 +146,7 @@ public interface SubmissionApi {
     ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
             @Parameter(description = "수정할 게시글 ID") @Positive Long submissionId,
             @RequestBody @Valid SubmissionUpdateRequest updateSubmission,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
     );
 
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
@@ -179,6 +177,6 @@ public interface SubmissionApi {
     })
     ResponseEntity<ApiResponse<Long>> deleteSubmission(
             @Parameter(description = "삭제할 게시글 ID") @Positive Long submissionId,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
     );
 }

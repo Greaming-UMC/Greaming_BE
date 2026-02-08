@@ -3,8 +3,8 @@ spring:
     name: greaming
 
   # 프로필 설정
-  profiles:
-    active: local
+  config:
+    import: optional:classpath:application-local.yml
 
   jpa:
     open-in-view: false

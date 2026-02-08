@@ -4,8 +4,8 @@ import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.challenge.enums.JourneyLevel;
 import com.umc.greaming.domain.challenge.repository.WeeklyUserScoreRepository;
-import com.umc.greaming.domain.comment.dto.response.CommentInfo; // [추가]
-import com.umc.greaming.domain.comment.dto.response.CommentPageResponse; // [추가]
+import com.umc.greaming.domain.comment.dto.response.CommentInfo;
+import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
 import com.umc.greaming.common.s3.service.S3Service;
@@ -58,9 +58,7 @@ public class SubmissionQueryService {
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
-
         String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
-
         return SubmissionPreviewResponse.from(submission, thumbnailUrl, tags);
     }
 
@@ -75,11 +73,36 @@ public class SubmissionQueryService {
         List<TagInfo> tagInfos = getTagInfos(submissionId);
         SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission, tagInfos);
 
+        // 댓글 페이징 및 변환 (공통 메서드 사용)
+        CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page, loginUser);
+
+        return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
+    }
+
+    // 2. 댓글 목록만 조회 (더보기/스크롤용)
+    public CommentPageResponse getCommentList(Long submissionId, int page) {
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
+
+        // 현재 Controller 구조상 댓글 목록 조회엔 User를 안 넘기므로 null 처리
+        // 추후 댓글 좋아요 여부가 필요하면 Controller에서 User를 넘겨주도록 수정 후 여기로 전달하면 됨
+        return getCommentPageResponse(submission, page, null);
+    }
+
+    public SubmissionInfo getSubmissionInfo(Long submissionId, User loginUser) {
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        return createSubmissionInfoFromEntity(submission, loginUser);
+    }
+
+    // --- [Private Helper Methods] ---
+
+    /**
+     * 댓글 페이징 조회 및 DTO 변환 (중복 로직 추출)
+     */
+    private CommentPageResponse getCommentPageResponse(Submission submission, int page, User loginUser) {
         int pageIndex = (page > 0) ? page - 1 : 0;
         Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("createdAt").descending());
         Page<Comment> commentEntityPage = commentRepository.findAllBySubmission(submission, pageable);
 
-        // 3. [핵심] 댓글 엔티티 -> 댓글 Info 변환 (S3 URL 변환 수행)
         List<CommentInfo> commentInfos = commentEntityPage.getContent().stream()
                 .map(comment -> {
                     // 작성자 프로필 이미지 URL 변환
