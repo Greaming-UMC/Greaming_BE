@@ -13,6 +13,7 @@ import com.umc.greaming.domain.submission.entity.SubmissionImage;
 import com.umc.greaming.domain.submission.repository.SubmissionImageRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionTagRepository;
+import com.umc.greaming.domain.tag.dto.TagInfo;
 import com.umc.greaming.domain.tag.entity.SubmissionTag;
 import com.umc.greaming.domain.tag.entity.Tag;
 import com.umc.greaming.domain.tag.repository.TagRepository;
@@ -41,7 +42,7 @@ public class SubmissionCommandService {
      */
     public SubmissionInfo createSubmission(SubmissionCreateRequest request, User user) {
 
-        // 1. 게시글 엔티티 생성 및 저장 (Builder 사용)
+        // 1. 게시글 엔티티 생성 및 저장
         Submission submission = Submission.builder()
                 .user(user)
                 .title(request.title())
@@ -50,7 +51,6 @@ public class SubmissionCommandService {
                 .commentEnabled(request.commentEnabled())
                 .field(request.field())
                 .thumbnailKey(request.thumbnailKey())
-                // .challenge(...) // 챌린지 연동 로직 필요 시 추가
                 .build();
 
         submissionRepository.save(submission);
@@ -72,28 +72,23 @@ public class SubmissionCommandService {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
 
-        // 1. 권한 검증 (User PK: userId)
+        // 1. 권한 검증
         if (!submission.getUser().getUserId().equals(user.getUserId())) {
             throw new GeneralException(ErrorStatus.SUBMISSION_NOT_AUTHORIZED);
         }
 
-        // 2. 엔티티 비즈니스 메서드를 통한 정보 수정 (Setter 사용 X)
-        // 제목, 내용 수정 (null 체크는 엔티티 내부 or 메서드 호출 전 수행)
+        // 2. 정보 수정
         submission.updateInfo(request.title(), request.caption());
-
-        // 공개 범위 수정
         submission.updateVisibility(request.visibility());
-
-        // 댓글 허용 여부 수정
         submission.changeCommentEnabled(request.commentEnabled());
 
-        // 3. 이미지 수정 (기존 이미지 삭제 -> 새 이미지 저장)
+        // 3. 이미지 수정 (삭제 후 재생성)
         if (request.imageList() != null) {
             submissionImageRepository.deleteAllBySubmission(submission);
             saveImages(submission, request.imageList());
         }
 
-        // 4. 태그 수정 (기존 태그 삭제 -> 새 태그 저장)
+        // 4. 태그 수정 (삭제 후 재생성)
         if (request.tags() != null) {
             submissionTagRepository.deleteAllBySubmission(submission);
             saveTags(submission, request.tags());
@@ -109,14 +104,10 @@ public class SubmissionCommandService {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
 
-        // 권한 검증
         if (!submission.getUser().getUserId().equals(user.getUserId())) {
             throw new GeneralException(ErrorStatus.SUBMISSION_NOT_AUTHORIZED);
         }
 
-        // Soft Delete 적용
-        // 엔티티의 delete() 메서드가 deletedAt을 현재 시간으로 설정함.
-        // @Transactional에 의해 메서드 종료 시 Dirty Checking으로 DB에 반영됨.
         submission.delete();
     }
 
@@ -159,17 +150,20 @@ public class SubmissionCommandService {
                 .map(img -> s3Service.getPublicUrl(img.getImageKey()))
                 .toList();
 
-        // 태그 이름 리스트 조회
-        List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submission.getId());
+        // [변경] 태그 정보 리스트 조회 (String -> TagInfo)
+        List<TagInfo> tagInfos = submissionTagRepository.findAllBySubmissionId(submission.getId())
+                .stream()
+                .map(st -> TagInfo.from(st.getTag()))
+                .toList();
 
         // 프로필 이미지 URL
         String profileUrl = s3Service.getPublicUrl(user.getProfileImageKey());
 
-        // 레벨 조회 (없으면 SKETCHER)
+        // 레벨 조회
         String level = getLevelBySubmission(submission);
 
         // 작성/수정 직후이므로 좋아요 여부는 false
-        return SubmissionInfo.from(submission, profileUrl, level, imageUrls, tags, false);
+        return SubmissionInfo.from(submission, profileUrl, level, imageUrls, tagInfos, false);
     }
 
     private String getLevelBySubmission(Submission submission) {

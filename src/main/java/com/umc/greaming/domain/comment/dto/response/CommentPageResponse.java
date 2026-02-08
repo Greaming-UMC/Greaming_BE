@@ -1,5 +1,6 @@
 package com.umc.greaming.domain.comment.dto.response;
 
+import com.umc.greaming.domain.comment.dto.CommentInfo;
 import com.umc.greaming.domain.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 

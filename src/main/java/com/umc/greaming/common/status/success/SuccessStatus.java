@@ -39,11 +39,13 @@ public enum SuccessStatus implements BaseStatus {
 
     //댓글
     COMMENT_LIST_SUCCESS("COMMENT_200", HttpStatus.OK , "다음 댓글 불러오기 성공" ),
+    COMMENT_CREATED("COMMENT_200", HttpStatus.OK , "댓글 생성 성공" ),
     // user
     USER_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "내 프로필 화면 조회 성공"),
 
     //s3
     S3_UPLOAD_SUCCESS("S3_200", HttpStatus.OK, "Presigned URL 발급 성공");
+
 
 
     private final String code;

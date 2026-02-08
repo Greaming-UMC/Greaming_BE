@@ -2,8 +2,8 @@ package com.umc.greaming.domain.submission.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.umc.greaming.domain.submission.entity.Submission;
-import io.swagger.v3.oas.annotations.media.Schema;
 import com.umc.greaming.domain.tag.dto.TagInfo;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,10 +36,9 @@ public record SubmissionInfo(
 
         @Schema(description = "게시글 본문", example = "설명입니다.")
         String caption,
-        List<TagInfo> tags,
 
-        @Schema(description = "태그 목록", example = "[\"일러스트\", \"창작\"]")
-        List<String> tags,
+        @Schema(description = "태그 정보 목록")
+        List<TagInfo> tags, // [수정] String -> TagInfo로 변경 및 중복 제거
 
         @Schema(description = "현재 사용자의 좋아요 여부", example = "false")
         Boolean liked,
@@ -48,12 +47,12 @@ public record SubmissionInfo(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime uploadAt
 ) {
-    public static SubmissionInfo from(Submission submission, List<String> sortedImages, List<TagInfo> tags, boolean isLiked) {
+    // Factory Method
     public static SubmissionInfo from(Submission submission,
                                       String profileImageUrl,
                                       String level,
                                       List<String> sortedImages,
-                                      List<String> tags,
+                                      List<TagInfo> tags, // [수정] 파라미터 타입 변경 (List<String> -> List<TagInfo>)
                                       boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
@@ -65,7 +64,7 @@ public record SubmissionInfo(
                 submission.getBookmarkCount(),
                 submission.getTitle(),
                 submission.getCaption(),
-                tags,
+                tags, // [수정] TagInfo 리스트 전달
                 isLiked,
                 submission.getCreatedAt()
         );

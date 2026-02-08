@@ -1,4 +1,4 @@
-package com.umc.greaming.domain.comment.dto.response;
+package com.umc.greaming.domain.comment.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.umc.greaming.domain.comment.entity.Comment;

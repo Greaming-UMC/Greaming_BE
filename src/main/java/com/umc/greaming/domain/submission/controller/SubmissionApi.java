@@ -19,11 +19,11 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Submission API", description = "게시글 관련 API")
 @Validated
+@RequestMapping("/api/submissions") // [추가] 공통 URL 경로
 public interface SubmissionApi {
 
     @Operation(summary = "게시글 생성", description = "새로운 게시글을 등록합니다. (썸네일, 분야 필수)")
@@ -41,9 +41,10 @@ public interface SubmissionApi {
                     )
             )
     })
+    @PostMapping // [추가] 메서드 매핑
     ResponseEntity<ApiResponse<SubmissionInfo>> createSubmission(
             @RequestBody @Valid SubmissionCreateRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
     @Operation(summary = "게시글 미리보기 조회", description = "게시글 ID를 통해 미리보기 정보를 조회합니다.")
@@ -61,8 +62,9 @@ public interface SubmissionApi {
                     )
             )
     })
+    @GetMapping("/{submissionId}/preview") // [추가]
     ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(
-            @Parameter(description = "게시글 ID") @Positive Long submissionId
+            @Parameter(description = "게시글 ID") @Positive @PathVariable("submissionId") Long submissionId // [추가] @PathVariable 필수
     );
 
     @Operation(summary = "게시글 상세 조회", description = "게시글 ID와 페이지 번호를 통해 상세 정보를 조회합니다. (첫 화면 로딩용)")
@@ -80,10 +82,11 @@ public interface SubmissionApi {
                     )
             )
     })
+    @GetMapping("/{submissionId}") // [추가]
     ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
-            @Parameter(description = "게시글 ID") @Positive Long submissionId,
+            @Parameter(description = "게시글 ID") @Positive @PathVariable("submissionId") Long submissionId, // [추가] @PathVariable
             @Parameter(description = "페이지 번호 (1부터 시작)") @RequestParam(defaultValue = "1") @Positive int page,
-            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
     @Operation(summary = "댓글 목록 조회 (페이징)", description = "게시글의 댓글만 따로 조회합니다. (스크롤/더보기 기능용)")
@@ -101,8 +104,9 @@ public interface SubmissionApi {
                     )
             )
     })
+    @GetMapping("/{submissionId}/comments") // [추가]
     ResponseEntity<ApiResponse<CommentPageResponse>> getCommentList(
-            @Parameter(description = "게시글 ID") @Positive Long submissionId,
+            @Parameter(description = "게시글 ID") @Positive @PathVariable("submissionId") Long submissionId, // [추가] @PathVariable
             @Parameter(description = "페이지 번호 (1부터 시작)") @RequestParam(defaultValue = "1") @Positive int page
     );
 
@@ -143,10 +147,11 @@ public interface SubmissionApi {
                     )
             )
     })
+    @PutMapping("/{submissionId}") // [추가]
     ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
-            @Parameter(description = "수정할 게시글 ID") @Positive Long submissionId,
+            @Parameter(description = "수정할 게시글 ID") @Positive @PathVariable("submissionId") Long submissionId, // [추가] @PathVariable
             @RequestBody @Valid SubmissionUpdateRequest updateSubmission,
-            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
@@ -175,8 +180,9 @@ public interface SubmissionApi {
                     )
             )
     })
+    @DeleteMapping("/{submissionId}") // [추가]
     ResponseEntity<ApiResponse<Long>> deleteSubmission(
-            @Parameter(description = "삭제할 게시글 ID") @Positive Long submissionId,
-            @Parameter(hidden = true) @AuthenticationPrincipal Long userId // [수정] UserDetails -> Long
+            @Parameter(description = "삭제할 게시글 ID") @Positive @PathVariable("submissionId") Long submissionId, // [추가] @PathVariable
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 }

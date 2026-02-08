@@ -1,8 +1,6 @@
 package com.umc.greaming.domain.submission.dto.request;
 
 import com.umc.greaming.domain.submission.enums.SubmissionVisibility;
-
-import com.umc.greaming.domain.submission.enums.SubmissionVisibility; // Enum Import 확인
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
@@ -12,14 +10,12 @@ public record SubmissionUpdateRequest(
 
         @Schema(description = "수정할 게시글 내용 (null일 경우 변경 없음)", example = "내용을 수정합니다.")
         String caption,
-        SubmissionVisibility visibility,
-        Boolean commentEnabled,
 
         @Schema(description = "수정할 공개 범위 (null일 경우 변경 없음)", example = "PRIVATE")
-        SubmissionVisibility visibility, // [추가] 서비스 로직과 맞추기 위해 필요
+        SubmissionVisibility visibility, // [수정] 중복 제거 및 Enum 타입 사용
 
         @Schema(description = "수정할 댓글 허용 여부 (null일 경우 변경 없음)", example = "false")
-        Boolean commentEnabled, // [추가]
+        Boolean commentEnabled, // [수정] 중복 제거
 
         @Schema(description = "수정할 태그 목록 (보낼 경우 기존 태그 싹 지우고 이걸로 교체됨)", example = "[\"수정태그1\", \"태그2\"]")
         List<String> tags,

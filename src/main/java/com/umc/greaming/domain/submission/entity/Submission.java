@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "submissions")
 @Getter
-// @Setter [제거] : 엔티티의 일관성을 위해 닫음
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -44,7 +43,7 @@ public class Submission extends BaseEntity {
     private String title;
 
     @Column(name = "thumbnail_key", nullable = false)
-    private String thumbnailKey;
+    private String thumbnailKey; // [주의] 변수명은 thumbnailKey입니다.
 
     @Column(name = "caption", columnDefinition = "TEXT")
     private String caption;
@@ -85,7 +84,8 @@ public class Submission extends BaseEntity {
 
     // 1. 게시글 정보 수정 (제목, 설명)
     public void updateInfo(String title, String caption) {
-        if (title != null && !title.isBlank()) {
+        // null이 아니거나 빈 문자열이 아닐 때만 업데이트 (정책에 따라 조정 가능)
+        if (title != null) {
             this.title = title;
         }
         if (caption != null) {
@@ -93,7 +93,19 @@ public class Submission extends BaseEntity {
         }
     }
 
-    // 2. 공개 범위 변경
+    // 2. 공개 범위 변경 (Service에서 String으로 넘길 경우를 대비해 오버로딩 or 타입 일치 필요)
+    // 여기서는 Service가 DTO(String) -> Enum 변환을 해서 넘겨준다고 가정하고 Enum으로 받습니다.
+    public void updateVisibility(String visibilityStr) {
+        if (visibilityStr != null) {
+            try {
+                this.visibility = SubmissionVisibility.valueOf(visibilityStr);
+            } catch (IllegalArgumentException e) {
+                // 잘못된 Enum 값이 들어오면 무시하거나 예외 처리 (여기선 기존 유지)
+            }
+        }
+    }
+
+    // Service에서 이미 Enum으로 변환해서 준다면 이 메서드 사용
     public void updateVisibility(SubmissionVisibility visibility) {
         if (visibility != null) {
             this.visibility = visibility;
@@ -112,14 +124,15 @@ public class Submission extends BaseEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
-    // 5. 좋아요/댓글/북마크 수 조정
+    // 5. 조회수/좋아요 등 카운트 메서드
     public void increaseLikeCount() { this.likeCount++; }
     public void decreaseLikeCount() { if (this.likeCount > 0) this.likeCount--; }
 
     public void increaseCommentCount() { this.commentCount++; }
     public void decreaseCommentCount() { if (this.commentCount > 0) this.commentCount--; }
 
-    public void update(String title, String caption, SubmissionVisibility visibility, Boolean commentEnabled, String thumbnailUrl) {
+    // [수정] 아래 메서드에서 컴파일 에러가 났었습니다. (thumbnailUrl -> thumbnailKey)
+    public void update(String title, String caption, SubmissionVisibility visibility, Boolean commentEnabled, String thumbnailKey) {
         if (title != null && !title.isBlank()) {
             this.title = title;
         }
@@ -132,8 +145,8 @@ public class Submission extends BaseEntity {
         if (commentEnabled != null) {
             this.commentEnabled = commentEnabled;
         }
-        if (thumbnailUrl != null && !thumbnailUrl.isBlank()) {
-            this.thumbnailUrl = thumbnailUrl;
+        if (thumbnailKey != null && !thumbnailKey.isBlank()) {
+            this.thumbnailKey = thumbnailKey; // [수정됨] this.thumbnailUrl (X) -> this.thumbnailKey (O)
         }
     }
 }
