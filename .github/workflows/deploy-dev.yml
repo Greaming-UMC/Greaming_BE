@@ -58,7 +58,7 @@ jobs:
             echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env
             echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env
             echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env
-            echo "OAUTH2_REDIRECT_URI=http://localhost:5173/oauth/callback" >> .env
+            echo "OAUTH2_REDIRECT_URI=http://localhost:5173/auth/callback" >> .env
             echo "SWAGGER_URL=http://${{ secrets.EC2_HOST }}:8081" >> .env
 
             sudo docker run -d -p 8081:8081 --name greaming-dev \
