@@ -177,9 +177,14 @@ public interface SubmissionApi {
                                         },
                                         "commentPage": {
                                            "comments": [],
-                                           "currentPage": 1,
-                                           "totalElements": 0,
-                                           "isLast": true
+                                           "pageInfo": {
+                                             "currentPage": 1,
+                                             "pageSize": 30,
+                                             "totalPages": 0,
+                                             "totalElements": 0,
+                                             "isLast": true,
+                                             "isFirst": true
+                                           }
                                         }
                                       }
                                     }
@@ -240,9 +245,14 @@ public interface SubmissionApi {
                                              "isWriter": false
                                            }
                                         ],
-                                        "currentPage": 2,
-                                        "totalPages": 5,
-                                        "isLast": false
+                                        "pageInfo": {
+                                          "currentPage": 2,
+                                          "pageSize": 30,
+                                          "totalPages": 5,
+                                          "totalElements": 150,
+                                          "isLast": false,
+                                          "isFirst": false
+                                        }
                                       }
                                     }
                                     """
