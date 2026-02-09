@@ -31,4 +31,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
             "ORDER BY (s.likeCount * 2 + s.commentCount * 3 + s.bookmarkCount * 5) DESC, s.createdAt DESC")
     Page<Submission> findAllByChallengeIdOrderByRecommend(@Param("challengeId") Long challengeId, Pageable pageable);
 
+    @Query("SELECT s FROM Submission s " +
+            "ORDER BY (s.likeCount * 2 + s.commentCount * 3 + s.bookmarkCount * 5) DESC, s.createdAt DESC")
+    Page<Submission> findAllOrderByRecommend(Pageable pageable);
 }

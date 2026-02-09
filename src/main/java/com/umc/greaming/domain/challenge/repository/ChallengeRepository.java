@@ -2,9 +2,6 @@ package com.umc.greaming.domain.challenge.repository;
 
 import com.umc.greaming.domain.challenge.entity.Challenge;
 import com.umc.greaming.domain.challenge.enums.Cycle;
-import com.umc.greaming.domain.submission.entity.Submission;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,5 +18,12 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             "ORDER BY c.startAt DESC LIMIT 1")
     Optional<Challenge> findCurrentChallenge(@Param("cycle") Cycle cycle, @Param("now") LocalDateTime now);
 
-
+    @Query("SELECT c FROM Challenge c " +
+            "WHERE c.cycle = :cycle " +
+            "AND c.startAt <= :dateTime " +
+            "AND c.endAt >= :dateTime")
+    Optional<Challenge> findByCycleAndDate(
+            @Param("cycle") Cycle cycle,
+            @Param("dateTime") LocalDateTime dateTime
+    );
 }

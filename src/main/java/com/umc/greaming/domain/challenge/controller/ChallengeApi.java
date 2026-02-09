@@ -21,18 +21,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/challenges")
 public interface ChallengeApi {
 
-    @Operation(summary = "챌린지별 게시물 목록 조회", description = """
-            특정 챌린지에 참여한 게시물들을 조회합니다.
+    @Operation(summary = "현재 진행 중인 챌린지 게시물 목록 조회", description = """
+            현재 진행 중인 데일리/주간 챌린지에 참여한 게시물들을 조회합니다.
             
-            **정렬 기준 (sortBy):**
-            - `latest`: 최신순 (기본값)
-            - `popular`: 인기순 (좋아요 많은 순)
-            - `bookmarks`: 북마크 많은 순
+            **챌린지 타입 (challengeType):**
+            - `DAILY`: 데일리 챌린지
+            - `WEEKLY`: 주간 챌린지
+            
+            **정렬:**
+            - 최신순으로 고정
             
             **페이지 사이즈:**
-            - 기본값: 20
+            - 기본값: 5
             - 최소: 1
-            - 최대: 100
+            - 최대: 20
             """)
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -56,13 +58,21 @@ public interface ChallengeApi {
                                             "likesCount": 10,
                                             "commentCount": 5,
                                             "bookmarkCount": 15
+                                          },
+                                          {
+                                            "submissionId": 99,
+                                            "thumbnailUrl": "https://s3.../thumbnail2.jpg",
+                                            "nickname": "화가",
+                                            "likesCount": 8,
+                                            "commentCount": 3,
+                                            "bookmarkCount": 12
                                           }
                                         ],
                                         "pageInfo": {
                                           "currentPage": 1,
-                                          "pageSize": 20,
-                                          "totalPages": 5,
-                                          "totalElements": 100,
+                                          "pageSize": 5,
+                                          "totalPages": 10,
+                                          "totalElements": 50,
                                           "isLast": false,
                                           "isFirst": true
                                         }
@@ -74,7 +84,7 @@ public interface ChallengeApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
-                    description = "존재하지 않는 챌린지",
+                    description = "현재 진행 중인 챌린지가 없음",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponse.class),
@@ -83,7 +93,25 @@ public interface ChallengeApi {
                                     {
                                       "isSuccess": false,
                                       "code": "CHALLENGE_404",
-                                      "message": "챌린지를 찾을 수 없습니다.",
+                                      "message": "현재 진행 중인 챌린지를 찾을 수 없습니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 챌린지 타입",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMM_400",
+                                      "message": "챌린지 타입은 DAILY 또는 WEEKLY여야 합니다.",
                                       "result": null
                                     }
                                     """
@@ -91,18 +119,15 @@ public interface ChallengeApi {
                     )
             )
     })
-    @GetMapping("/{challengeId}/submissions")
-    ResponseEntity<ApiResponse<ChallengeSubmissionsResponse>> getChallengeSubmissions(
-            @Parameter(description = "챌린지 ID", required = true) 
-            @Positive @PathVariable("challengeId") Long challengeId,
+    @GetMapping("/current/submissions")
+    ResponseEntity<ApiResponse<ChallengeSubmissionsResponse>> getCurrentChallengeSubmissions(
+            @Parameter(description = "챌린지 타입 (DAILY, WEEKLY)", required = true, example = "DAILY") 
+            @RequestParam String challengeType,
             
             @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") 
             @RequestParam(defaultValue = "1") @Positive int page,
             
-            @Parameter(description = "페이지 사이즈 (1-100)", example = "20") 
-            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size,
-            
-            @Parameter(description = "정렬 기준 (latest, popular, bookmarks)", example = "latest") 
-            @RequestParam(defaultValue = "latest") String sortBy
+            @Parameter(description = "페이지 사이즈 (1-20)", example = "5") 
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size
     );
 }
