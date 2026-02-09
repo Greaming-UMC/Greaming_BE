@@ -1,8 +1,7 @@
-package com.umc.greaming.domain.like.entity;
+package com.umc.greaming.domain.comment.entity;
 
 
 import com.umc.greaming.common.base.BaseEntity;
-import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;

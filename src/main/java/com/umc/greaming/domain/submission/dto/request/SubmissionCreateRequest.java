@@ -19,7 +19,7 @@ public record SubmissionCreateRequest(
         @NotNull(message = "공개 범위는 필수입니다.")
         SubmissionVisibility visibility,
 
-        @Schema(description = "작품 분야 (IL, WEBTOON 등)", example = "IL")
+        @Schema(description = "작품 분야 (FREE, WEEKLY, DAILY)", example = "FREE")
         @NotNull(message = "분야(field)는 필수입니다.")
         SubmissionField field,
 

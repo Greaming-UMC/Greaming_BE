@@ -1,6 +1,6 @@
-package com.umc.greaming.domain.tag.repository;
+package com.umc.greaming.domain.user.repository;
 
-import com.umc.greaming.domain.tag.entity.UserInterestTag;
+import com.umc.greaming.domain.user.entity.UserInterestTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface UserInterestTagRepository extends JpaRepository<UserInterestTag, Long> {
 
-    @Query("select t.name from UserInterestTag uit join uit.tag t where uit.user.id = :userId")
+    @Query("select t.name from UserInterestTag uit join uit.tag t where uit.user.userId = :userId")
     List<String> findTagNamesByUserId(@Param("userId") Long userId);
 }

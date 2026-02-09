@@ -2,8 +2,8 @@ package com.umc.greaming.domain.user.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
 import com.umc.greaming.domain.auth.entity.Provider;
-import com.umc.greaming.domain.user.entity.enums.UserState;
-import com.umc.greaming.domain.user.entity.enums.Visibility;
+import com.umc.greaming.domain.user.enums.UserState;
+import com.umc.greaming.domain.user.enums.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
 

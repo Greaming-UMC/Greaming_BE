@@ -1,7 +1,7 @@
 package com.umc.greaming.domain.submission.repository;
 
 import com.umc.greaming.domain.submission.entity.Submission;
-import com.umc.greaming.domain.tag.entity.SubmissionTag;
+import com.umc.greaming.domain.submission.entity.SubmissionTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

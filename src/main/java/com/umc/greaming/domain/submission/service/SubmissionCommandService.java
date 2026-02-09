@@ -14,7 +14,7 @@ import com.umc.greaming.domain.submission.repository.SubmissionImageRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionTagRepository;
 import com.umc.greaming.domain.tag.dto.TagInfo;
-import com.umc.greaming.domain.tag.entity.SubmissionTag;
+import com.umc.greaming.domain.submission.entity.SubmissionTag;
 import com.umc.greaming.domain.tag.entity.Tag;
 import com.umc.greaming.domain.tag.repository.TagRepository;
 import com.umc.greaming.domain.user.entity.User;
@@ -85,12 +85,14 @@ public class SubmissionCommandService {
         // 3. 이미지 수정 (삭제 후 재생성)
         if (request.imageList() != null) {
             submissionImageRepository.deleteAllBySubmission(submission);
+            submissionImageRepository.flush(); // 즉시 DELETE 실행
             saveImages(submission, request.imageList());
         }
 
         // 4. 태그 수정 (삭제 후 재생성)
         if (request.tags() != null) {
             submissionTagRepository.deleteAllBySubmission(submission);
+            submissionTagRepository.flush(); // 즉시 DELETE 실행
             saveTags(submission, request.tags());
         }
 

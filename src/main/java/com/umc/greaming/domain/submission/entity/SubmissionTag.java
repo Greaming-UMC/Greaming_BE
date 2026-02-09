@@ -1,26 +1,26 @@
-package com.umc.greaming.domain.tag.entity;
+package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
-import com.umc.greaming.domain.user.entity.User;
+import com.umc.greaming.domain.tag.entity.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "user_interest_tags")
+@Table(name = "submission_tags")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserInterestTag extends BaseEntity {
+public class SubmissionTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_interest_tag_id")
+    @Column(name = "submission_tag_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "submission_id", nullable = false)
+    private Submission submission;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)

@@ -38,8 +38,14 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .requestMatchers("/api/submissions/**");
-        // 해당 경로는 Spring Security 필터 체인을 아예 무시함
+                .requestMatchers(
+                        "/h2-console/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                );
+        // [수정] /api/submissions/** 제거 - 인증이 필요한 경로임
     }
 
     @Bean
@@ -56,6 +62,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 PUBLIC_URLS
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/submissions/*/preview"  // 게시글 미리보기는 공개
                         ).permitAll()
                         .requestMatchers(
                                 "/actuator/**"

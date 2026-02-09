@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ReplyResponse(
         List<ReplyInfo> replies,
-        int totalCount // (선택) 총 개수도 같이 주면 좋음
+        int totalCount
 ) {
     public static ReplyResponse of(List<ReplyInfo> replies) {
         return new ReplyResponse(replies, replies.size());

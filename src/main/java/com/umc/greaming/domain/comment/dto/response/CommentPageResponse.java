@@ -13,10 +13,9 @@ public record CommentPageResponse(
         long totalElements,
         boolean isLast
 ) {
-    // [수정] Page객체(메타데이터용) + 변환된 Info 리스트(데이터용)를 같이 받음
     public static CommentPageResponse from(Page<Comment> commentPage, List<CommentInfo> commentInfos) {
         return new CommentPageResponse(
-                commentInfos, // 변환된 Info 리스트 사용
+                commentInfos,
                 commentPage.getNumber() + 1,
                 commentPage.getTotalPages(),
                 commentPage.getTotalElements(),

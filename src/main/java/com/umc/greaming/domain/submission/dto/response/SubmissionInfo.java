@@ -10,6 +10,12 @@ import java.util.List;
 
 @Schema(description = "게시글 핵심 정보 DTO")
 public record SubmissionInfo(
+        @Schema(description = "게시글 ID", example = "1")
+        Long submissionId,
+
+        @Schema(description = "작성자 ID", example = "1")
+        Long userId,
+
         @Schema(description = "작성자 닉네임", example = "그림쟁이")
         String nickname,
 
@@ -38,7 +44,7 @@ public record SubmissionInfo(
         String caption,
 
         @Schema(description = "태그 정보 목록")
-        List<TagInfo> tags, // [수정] String -> TagInfo로 변경 및 중복 제거
+        List<TagInfo> tags,
 
         @Schema(description = "현재 사용자의 좋아요 여부", example = "false")
         Boolean liked,
@@ -55,6 +61,8 @@ public record SubmissionInfo(
                                       List<TagInfo> tags,
                                       boolean isLiked) {
         return new SubmissionInfo(
+                submission.getId(),
+                submission.getUser().getUserId(),
                 submission.getUser().getNickname(),
                 profileImageUrl,
                 level,

@@ -59,7 +59,7 @@ public class SubmissionController implements SubmissionApi {
 
     @Override
     public ResponseEntity<ApiResponse<SubmissionInfo>> createSubmission(
-            @RequestBody @Valid SubmissionCreateRequest request,
+            @RequestBody SubmissionCreateRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
         User user = findUserOrThrow(userId);
@@ -70,7 +70,7 @@ public class SubmissionController implements SubmissionApi {
     @Override
     public ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
             @PathVariable Long submissionId,
-            @RequestBody @Valid SubmissionUpdateRequest updateSubmission,
+            @RequestBody SubmissionUpdateRequest updateSubmission,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
         User user = findUserOrThrow(userId);

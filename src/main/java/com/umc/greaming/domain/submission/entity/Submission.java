@@ -43,7 +43,7 @@ public class Submission extends BaseEntity {
     private String title;
 
     @Column(name = "thumbnail_key", nullable = false)
-    private String thumbnailKey; // [주의] 변수명은 thumbnailKey입니다.
+    private String thumbnailKey;
 
     @Column(name = "caption", columnDefinition = "TEXT")
     private String caption;

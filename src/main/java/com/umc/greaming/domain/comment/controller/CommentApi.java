@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/comments")
 public interface CommentApi {
 
-    // 1. 댓글 생성
     @Operation(summary = "댓글 생성", description = "게시글에 새로운 댓글을 작성합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -97,7 +96,6 @@ public interface CommentApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 2. 답글 목록 조회
     @Operation(summary = "답글 목록 조회", description = "특정 댓글의 답글(대댓글) 목록을 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -154,7 +152,6 @@ public interface CommentApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 3. 답글 생성
     @Operation(summary = "답글 생성", description = "특정 댓글에 답글을 작성합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

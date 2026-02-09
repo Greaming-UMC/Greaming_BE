@@ -11,7 +11,7 @@ public record SubmissionUpdateRequest(
         @Schema(description = "수정할 게시글 내용 (null일 경우 변경 없음)", example = "내용을 수정합니다.")
         String caption,
 
-        @Schema(description = "수정할 공개 범위 (null일 경우 변경 없음)", example = "PRIVATE")
+        @Schema(description = "수정할 공개 범위 (null일 경우 변경 없음)", example = "PUBLIC")
         SubmissionVisibility visibility,
 
         @Schema(description = "수정할 댓글 허용 여부 (null일 경우 변경 없음)", example = "false")

@@ -23,7 +23,7 @@ public class CommentQueryService {
     private final ReplyRepository replyRepository;
     private final S3Service s3Service;
 
-    public ReplyResponse getReplyList(Long commentId, Long userId) { // userId: 현재 로그인한 사람(본인 확인용)
+    public ReplyResponse getReplyList(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 

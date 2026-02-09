@@ -53,7 +53,9 @@ public class SubmissionQueryService {
      * 게시글 미리보기 조회
      */
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        // [수정] User 정보도 함께 조회
+        Submission submission = submissionRepository.findByIdWithUser(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
         List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
         String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
         return SubmissionPreviewResponse.from(submission, thumbnailUrl, tags);
@@ -63,7 +65,9 @@ public class SubmissionQueryService {
      * 게시글 상세 조회
      */
     public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page, User loginUser) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        // [수정] User와 Challenge 정보도 함께 조회
+        Submission submission = submissionRepository.findByIdWithUserAndChallenge(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
         SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission, loginUser);
 
         Long userId = (loginUser != null) ? loginUser.getUserId() : null;
@@ -76,6 +80,7 @@ public class SubmissionQueryService {
      * 댓글 목록만 조회
      */
     public CommentPageResponse getCommentList(Long submissionId, int page, Long userId) {
+        // [수정] 댓글 조회시에는 기본 findById 사용 (User 정보 불필요)
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         return getCommentPageResponse(submission, page, userId);
     }
@@ -83,7 +88,9 @@ public class SubmissionQueryService {
     // [삭제] getReplyList 메서드 삭제됨 (CommentQueryService로 이동)
 
     public SubmissionInfo getSubmissionInfo(Long submissionId, User loginUser) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        // [수정] User와 Challenge 정보도 함께 조회
+        Submission submission = submissionRepository.findByIdWithUserAndChallenge(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
         return createSubmissionInfoFromEntity(submission, loginUser);
     }
 
@@ -100,14 +107,23 @@ public class SubmissionQueryService {
 
         Page<Comment> commentEntityPage = commentRepository.findAllBySubmission(submission, pageable);
 
+        // [수정] N+1 문제 해결: 좋아요 여부를 한 번의 쿼리로 일괄 조회
+        List<Long> likedCommentIds = List.of();
+        if (userId != null && !commentEntityPage.isEmpty()) {
+            List<Long> commentIds = commentEntityPage.getContent().stream()
+                    .map(Comment::getId)
+                    .toList();
+            likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserIdAndCommentIds(userId, commentIds);
+        }
+        
+        final List<Long> finalLikedCommentIds = likedCommentIds;
+
         List<CommentInfo> commentInfos = commentEntityPage.getContent().stream()
                 .map(comment -> {
                     String profileUrl = s3Service.getPublicUrl(comment.getUser().getProfileImageKey());
 
-                    boolean isCommentLiked = false;
-                    if (userId != null) {
-                        isCommentLiked = commentLikeRepository.existsByUserIdAndCommentId(userId, comment.getId());
-                    }
+                    // [수정] 일괄 조회한 결과에서 확인
+                    boolean isCommentLiked = finalLikedCommentIds.contains(comment.getId());
 
                     boolean isWriter = (userId != null) && comment.getUser().getUserId().equals(userId);
 

@@ -11,8 +11,7 @@ public record SubmissionDetailResponse(
         @Schema(description = "댓글 페이징 데이터")
         CommentPageResponse commentPage
 ) {
-    // [수정] Page<Comment> -> CommentPageResponse로 변경
-    // 엔티티 변환 책임은 Service에게 넘김
+
     public static SubmissionDetailResponse from(
             SubmissionInfo submissionInfo,
             CommentPageResponse commentPage) {

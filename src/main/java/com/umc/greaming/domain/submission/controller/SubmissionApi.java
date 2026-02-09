@@ -49,11 +49,18 @@ public interface SubmissionApi {
                                       "message": "게시물 추가 성공",
                                       "result": {
                                         "submissionId": 100,
-                                        "title": "이번주 챌린지 작품",
+                                        "userId": 1,
                                         "nickname": "그림쟁이",
                                         "profileImageUrl": "https://s3.ap-northeast-2.amazonaws.com/bucket/profile/user1.jpg",
-                                        "field": "WEEKLY",
-                                        "visibility": "PUBLIC",
+                                        "level": "SKETCHER",
+                                        "imageList": ["https://s3.../img1.jpg"],
+                                        "likesCount": 0,
+                                        "commentCount": 0,
+                                        "bookmarkCount": 0,
+                                        "title": "이번주 챌린지 작품",
+                                        "caption": "작품 설명입니다.",
+                                        "tags": [{"tagId": 1, "tagName": "일러스트"}],
+                                        "liked": false,
                                         "uploadAt": "2026-02-10T10:00:00"
                                       }
                                     }
@@ -154,19 +161,19 @@ public interface SubmissionApi {
                                       "result": {
                                         "submission": {
                                           "submissionId": 100,
+                                          "userId": 1,
                                           "nickname": "그림쟁이",
                                           "profileImageUrl": "https://s3.../profile.jpg",
                                           "level": "SKETCHER",
-                                          "imageList": [
-                                            "https://s3.../img1.jpg",
-                                            "https://s3.../img2.jpg"
-                                          ],
+                                          "imageList": ["https://s3.../img1.jpg", "https://s3.../img2.jpg"],
+                                          "likesCount": 10,
+                                          "commentCount": 5,
+                                          "bookmarkCount": 3,
                                           "title": "상세 제목",
                                           "caption": "상세 설명입니다.",
-                                          "field": "DAILY",
-                                          "visibility": "PUBLIC",
                                           "tags": [{"tagId": 1, "tagName": "수채화"}],
-                                          "liked": false
+                                          "liked": false,
+                                          "uploadAt": "2026-02-10T10:00:00"
                                         },
                                         "commentPage": {
                                            "comments": [],
@@ -224,10 +231,13 @@ public interface SubmissionApi {
                                       "result": {
                                         "comments": [
                                            {
-                                             "commentId": 5, 
+                                             "comment_id": 5,
+                                             "user_id": 2,
                                              "writer_nickname": "댓글러",
+                                             "writer_profileImgUrl": "https://s3.../user2.jpg",
                                              "content": "멋져요!",
-                                             "writer_profileImgUrl": "https://s3.../user2.jpg"
+                                             "isLiked": false,
+                                             "isWriter": false
                                            }
                                         ],
                                         "currentPage": 2,
@@ -288,8 +298,18 @@ public interface SubmissionApi {
                                       "message": "게시물 수정 성공",
                                       "result": {
                                         "submissionId": 100,
+                                        "userId": 1,
+                                        "nickname": "그림쟁이",
+                                        "profileImageUrl": "https://s3.../profile.jpg",
+                                        "level": "SKETCHER",
+                                        "imageList": ["https://s3.../new_img1.jpg"],
+                                        "likesCount": 10,
+                                        "commentCount": 5,
+                                        "bookmarkCount": 3,
                                         "title": "수정된 제목",
-                                        "visibility": "CIRCLE",
+                                        "caption": "수정된 설명",
+                                        "tags": [{"tagId": 2, "tagName": "수정태그"}],
+                                        "liked": false,
                                         "uploadAt": "2026-02-10T10:00:00"
                                       }
                                     }
