@@ -32,7 +32,10 @@ public enum ErrorStatus implements BaseStatus {
     DUPLICATE_EMAIL("AUTH_409", HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
     DUPLICATE_NICKNAME("AUTH_409", HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
 
-    // Submission (작품) Errors
+    //user
+    USER_ALREADY_REGISTERED("USER_409", HttpStatus.CONFLICT, "이미 정보가 등록된 유저입니다."),
+
+    //작품 미리보기
     SUBMISSION_NOT_FOUND("SUBMISSION_404", HttpStatus.NOT_FOUND, "작품을 찾을 수 없습니다."),
     SUBMISSION_NOT_AUTHORIZED("SUBMISSION_401", HttpStatus.UNAUTHORIZED, "올바른 사용자가 아닙니다."),
 
