@@ -9,12 +9,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController implements UserApi {
 
     private final UserService userService;
+
+    @Override
+    @GetMapping("/check-registered")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkRegistered(
+            @AuthenticationPrincipal Long userId
+    ) {
+        boolean registered = userService.isProfileRegistered(userId);
+        return ApiResponse.success(
+                SuccessStatus.USER_CHECK_REGISTERED_SUCCESS,
+                Map.of("profileRegistered", registered)
+        );
+    }
 
     @Override
     @PostMapping("/registinfo")
