@@ -24,6 +24,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_URLS = {
             "/api/auth/reissue",
+            "/api/auth/dev/**",
             "/oauth2/**",
             "/login/oauth2/**",
             "/h2-console/**",
