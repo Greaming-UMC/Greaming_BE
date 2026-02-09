@@ -54,4 +54,4 @@ jwt:
   secret: ${JWT_SECRET}
 
 swagger:
-  url: http://13.124.68.142:8081
+  url: https://api.greaming.com
