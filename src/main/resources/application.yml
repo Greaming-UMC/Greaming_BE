@@ -38,7 +38,7 @@ jwt:
 
 # OAuth2 리다이렉트 설정
 oauth2:
-  redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth/callback}
+  redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/auth/callback}
 
 swagger:
   url: http://localhost:8080
