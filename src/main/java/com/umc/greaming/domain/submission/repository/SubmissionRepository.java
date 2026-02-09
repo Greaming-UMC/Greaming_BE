@@ -10,10 +10,6 @@ import java.util.Optional;
 
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE Submission s SET s.deletedAt = CURRENT_TIMESTAMP WHERE s.id = :id")
-    void softDeleteById(@Param("id") Long id);
-
     @Query("SELECT s FROM Submission s JOIN FETCH s.user WHERE s.id = :id")
     Optional<Submission> findByIdWithUser(@Param("id") Long id);
 

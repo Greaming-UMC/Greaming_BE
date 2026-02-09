@@ -15,7 +15,6 @@ import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
