@@ -7,12 +7,9 @@ import com.umc.greaming.domain.challenge.enums.JourneyLevel;
 import com.umc.greaming.domain.challenge.repository.WeeklyUserScoreRepository;
 import com.umc.greaming.domain.comment.dto.CommentInfo;
 import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
-import com.umc.greaming.domain.comment.dto.ReplyInfo;
-import com.umc.greaming.domain.comment.dto.response.ReplyResponse;
 import com.umc.greaming.domain.comment.entity.Comment;
-import com.umc.greaming.domain.comment.entity.Reply;
+import com.umc.greaming.domain.comment.repository.CommentLikeRepository;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
-import com.umc.greaming.domain.comment.repository.ReplyRepository;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
@@ -40,17 +37,20 @@ public class SubmissionQueryService {
 
     private final SubmissionRepository submissionRepository;
     private final SubmissionTagRepository submissionTagRepository;
-    private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
-    private final WeeklyUserScoreRepository weeklyUserScoreRepository;
     private final SubmissionLikeRepository submissionLikeRepository;
+
+    private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    // private final ReplyRepository replyRepository; // [삭제] 더 이상 사용 안 함
+
+    private final WeeklyUserScoreRepository weeklyUserScoreRepository;
     private final S3Service s3Service;
-    private final ReplyRepository replyRepository;
 
     private static final int PAGE_SIZE = 30;
 
     /**
-     * 게시글 미리보기 조회 (단순 목록용)
+     * 게시글 미리보기 조회
      */
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
@@ -60,31 +60,28 @@ public class SubmissionQueryService {
     }
 
     /**
-     * 게시글 상세 조회 (게시글 정보 + 댓글 1페이지)
+     * 게시글 상세 조회
      */
     public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page, User loginUser) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
-
-        // 1. 게시글 Info 생성 (TagInfo 포함)
         SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission, loginUser);
 
-        // 2. 댓글 페이징 및 변환
-        CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page);
+        Long userId = (loginUser != null) ? loginUser.getUserId() : null;
+        CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page, userId);
 
         return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
     }
 
     /**
-     * 댓글 목록만 조회 (더보기/스크롤용)
+     * 댓글 목록만 조회
      */
-    public CommentPageResponse getCommentList(Long submissionId, int page) {
+    public CommentPageResponse getCommentList(Long submissionId, int page, Long userId) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
-        return getCommentPageResponse(submission, page);
+        return getCommentPageResponse(submission, page, userId);
     }
 
-    /**
-     * 게시글 단일 정보 조회 (수정 화면 등에서 사용)
-     */
+    // [삭제] getReplyList 메서드 삭제됨 (CommentQueryService로 이동)
+
     public SubmissionInfo getSubmissionInfo(Long submissionId, User loginUser) {
         Submission submission = findSubmissionByIdOrThrow(submissionId);
         return createSubmissionInfoFromEntity(submission, loginUser);
@@ -97,16 +94,24 @@ public class SubmissionQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
     }
 
-    private CommentPageResponse getCommentPageResponse(Submission submission, int page) {
+    private CommentPageResponse getCommentPageResponse(Submission submission, int page, Long userId) {
         int pageIndex = (page > 0) ? page - 1 : 0;
         Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("createdAt").descending());
+
         Page<Comment> commentEntityPage = commentRepository.findAllBySubmission(submission, pageable);
 
         List<CommentInfo> commentInfos = commentEntityPage.getContent().stream()
                 .map(comment -> {
                     String profileUrl = s3Service.getPublicUrl(comment.getUser().getProfileImageKey());
-                    boolean isCommentLiked = false; // 댓글 좋아요 로직 필요 시 추가
-                    return CommentInfo.from(comment, profileUrl, isCommentLiked);
+
+                    boolean isCommentLiked = false;
+                    if (userId != null) {
+                        isCommentLiked = commentLikeRepository.existsByUserIdAndCommentId(userId, comment.getId());
+                    }
+
+                    boolean isWriter = (userId != null) && comment.getUser().getUserId().equals(userId);
+
+                    return CommentInfo.from(comment, profileUrl, isCommentLiked, isWriter);
                 })
                 .toList();
 
@@ -116,22 +121,18 @@ public class SubmissionQueryService {
     private SubmissionInfo createSubmissionInfoFromEntity(Submission submission, User loginUser) {
         Long submissionId = submission.getId();
 
-        // 이미지 URL 리스트 변환
         List<String> sortedImageUrls = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
                 .stream()
                 .map(image -> s3Service.getPublicUrl(image.getImageKey()))
                 .toList();
 
-        // [핵심 변경] Tag 엔티티 조회 후 TagInfo로 변환
         List<TagInfo> tagInfos = submissionTagRepository.findAllBySubmissionId(submissionId)
                 .stream()
                 .map(submissionTag -> TagInfo.from(submissionTag.getTag()))
                 .toList();
 
-        // 작성자 프로필 이미지
         String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
 
-        // 챌린지 레벨 (없으면 기본값)
         String level = JourneyLevel.SKETCHER.name();
         if (submission.getChallenge() != null) {
             level = weeklyUserScoreRepository.findByUserAndChallenge(submission.getUser(), submission.getChallenge())
@@ -139,14 +140,11 @@ public class SubmissionQueryService {
                     .orElse(JourneyLevel.SKETCHER.name());
         }
 
-        // 좋아요 여부 확인
         boolean isLiked = false;
         if (loginUser != null) {
             isLiked = submissionLikeRepository.existsByUserAndSubmission(loginUser, submission);
         }
 
-        // DTO 반환 (List<TagInfo> 전달)
         return SubmissionInfo.from(submission, profileImageUrl, level, sortedImageUrls, tagInfos, isLiked);
     }
-
 }

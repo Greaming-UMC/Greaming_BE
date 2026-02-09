@@ -52,7 +52,7 @@ public record SubmissionInfo(
                                       String profileImageUrl,
                                       String level,
                                       List<String> sortedImages,
-                                      List<TagInfo> tags, // [수정] 파라미터 타입 변경 (List<String> -> List<TagInfo>)
+                                      List<TagInfo> tags,
                                       boolean isLiked) {
         return new SubmissionInfo(
                 submission.getUser().getNickname(),
@@ -64,7 +64,7 @@ public record SubmissionInfo(
                 submission.getBookmarkCount(),
                 submission.getTitle(),
                 submission.getCaption(),
-                tags, // [수정] TagInfo 리스트 전달
+                tags,
                 isLiked,
                 submission.getCreatedAt()
         );

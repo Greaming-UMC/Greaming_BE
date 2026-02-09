@@ -13,15 +13,20 @@ public record CommentInfo(
         String content,
 
         @JsonProperty("isLiked")
-        Boolean isLiked
+        Boolean isLiked,
+
+        // ▼▼▼ [추가] 본인 작성 여부 필드
+        @JsonProperty("isWriter")
+        Boolean isWriter
 ) {
-    // [수정] 외부에서 변환된 URL과 좋아요 여부를 파라미터로 받음
-    public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked) {
+    // [수정] isWriter 파라미터 추가
+    public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked, boolean isWriter) {
         return new CommentInfo(
                 comment.getUser().getNickname(),
-                profileUrl, // S3 URL (Service에서 변환해서 넘겨줌)
+                profileUrl,
                 comment.getContent(),
-                isLiked     // 좋아요 여부 (Service에서 조회해서 넘겨줌)
+                isLiked,
+                isWriter // [추가] 값 주입
         );
     }
 }

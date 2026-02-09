@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Validated
-// @RequestMapping 삭제 (인터페이스에 설정됨)
 public class SubmissionController implements SubmissionApi {
 
     private final SubmissionQueryService submissionQueryService;
@@ -36,7 +35,6 @@ public class SubmissionController implements SubmissionApi {
     private final UserRepository userRepository;
 
     @Override
-    // @GetMapping 삭제
     public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(
             @PathVariable Long submissionId
     ) {
@@ -45,7 +43,6 @@ public class SubmissionController implements SubmissionApi {
     }
 
     @Override
-    // @GetMapping 삭제
     public ResponseEntity<ApiResponse<SubmissionDetailResponse>> getSubmissionDetail(
             @PathVariable Long submissionId,
             @RequestParam(defaultValue = "1") int page,
@@ -61,7 +58,6 @@ public class SubmissionController implements SubmissionApi {
     }
 
     @Override
-    // @PostMapping 삭제
     public ResponseEntity<ApiResponse<SubmissionInfo>> createSubmission(
             @RequestBody @Valid SubmissionCreateRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
@@ -72,7 +68,6 @@ public class SubmissionController implements SubmissionApi {
     }
 
     @Override
-    // @PutMapping 삭제
     public ResponseEntity<ApiResponse<SubmissionInfo>> updateSubmission(
             @PathVariable Long submissionId,
             @RequestBody @Valid SubmissionUpdateRequest updateSubmission,
@@ -84,7 +79,6 @@ public class SubmissionController implements SubmissionApi {
     }
 
     @Override
-    // @DeleteMapping 삭제
     public ResponseEntity<ApiResponse<Long>> deleteSubmission(
             @PathVariable Long submissionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
@@ -95,16 +89,16 @@ public class SubmissionController implements SubmissionApi {
     }
 
     @Override
-    // @GetMapping 삭제
     public ResponseEntity<ApiResponse<CommentPageResponse>> getCommentList(
             @PathVariable Long submissionId,
-            @RequestParam(defaultValue = "1") int page
+            @RequestParam(defaultValue = "1") int page,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        CommentPageResponse result = submissionQueryService.getCommentList(submissionId, page);
+        CommentPageResponse result = submissionQueryService.getCommentList(submissionId, page, userId);
+
         return ApiResponse.success(SuccessStatus.COMMENT_LIST_SUCCESS, result);
     }
 
-    // --- Helper Method ---
     private User findUserOrThrow(Long userId) {
         if (userId == null) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED);

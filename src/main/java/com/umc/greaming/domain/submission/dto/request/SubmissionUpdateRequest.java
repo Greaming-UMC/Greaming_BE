@@ -12,10 +12,10 @@ public record SubmissionUpdateRequest(
         String caption,
 
         @Schema(description = "수정할 공개 범위 (null일 경우 변경 없음)", example = "PRIVATE")
-        SubmissionVisibility visibility, // [수정] 중복 제거 및 Enum 타입 사용
+        SubmissionVisibility visibility,
 
         @Schema(description = "수정할 댓글 허용 여부 (null일 경우 변경 없음)", example = "false")
-        Boolean commentEnabled, // [수정] 중복 제거
+        Boolean commentEnabled,
 
         @Schema(description = "수정할 태그 목록 (보낼 경우 기존 태그 싹 지우고 이걸로 교체됨)", example = "[\"수정태그1\", \"태그2\"]")
         List<String> tags,
