@@ -18,6 +18,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
 
+    @Transactional(readOnly = true)
+    public boolean isProfileRegistered(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        return user.isProfileRegistered();
+    }
+
     @Transactional
     public void registInfo(Long userId, RegistInfoRequest request) {
         User user = userRepository.findById(userId)

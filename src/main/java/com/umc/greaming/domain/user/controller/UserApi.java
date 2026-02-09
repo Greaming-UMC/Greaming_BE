@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,70 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "User API", description = "사용자 관련 API")
 @RequestMapping("/api/user")
 public interface UserApi {
+
+    @Operation(summary = "프로필 등록 여부 확인", description = "현재 로그인한 사용자가 최초 프로필 정보를 등록했는지 여부를 확인합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "프로필 등록 여부 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "프로필 등록 여부 조회 성공",
+                                      "result": {
+                                        "profileRegistered": false
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMM_401",
+                                      "message": "인증이 필요합니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "AUTH_404",
+                                      "message": "회원을 찾을 수 없습니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/check-registered")
+    ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> checkRegistered(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
 
     @Operation(
             summary = "최초 유저 정보 등록",
