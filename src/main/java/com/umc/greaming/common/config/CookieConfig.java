@@ -66,10 +66,10 @@ public class CookieConfig {
      * - 그 외: request.isSecure() 기반 (HTTPS 요청인 경우 true)
      */
     private boolean isSecureEnvironment(HttpServletRequest request) {
-        if ("prod".equals(activeProfile)) {
+        if ("prod".equals(activeProfile) || "dev".equals(activeProfile)) {
             return true;
         }
-        // 로컬/개발 환경에서는 요청 스킴에 따라 결정
+        // 로컬 환경에서는 요청 스킴에 따라 결정
         return request != null && request.isSecure();
     }
 
