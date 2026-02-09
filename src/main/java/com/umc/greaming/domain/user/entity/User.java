@@ -6,6 +6,7 @@ import com.umc.greaming.domain.user.enums.UserState;
 import com.umc.greaming.domain.user.enums.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,6 +48,11 @@ public class User extends BaseEntity {
     @Column(name = "visibility", nullable = false)
     private Visibility visibility;
 
+    @Column(name = "profile_registered", nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean profileRegistered = false;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Provider> providers = new ArrayList<>();
@@ -67,5 +73,11 @@ public class User extends BaseEntity {
 
     public void delete() {
         this.userState = UserState.DELETED;
+    }
+
+    public void registerProfile(String nickname, String introduction) {
+        this.nickname = nickname;
+        this.introduction = introduction;
+        this.profileRegistered = true;
     }
 }
