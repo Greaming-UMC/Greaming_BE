@@ -1,5 +1,5 @@
 package com.umc.greaming.domain.user.enums;
 
-public enum UserStatus {
+public enum UserState {
     ACTIVE, INACTIVE, DELETED
 }

@@ -1,12 +1,16 @@
 package com.umc.greaming.domain.submission.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
+import com.umc.greaming.domain.challenge.entity.Challenge;
+import com.umc.greaming.domain.circle.entity.Circle;
 import com.umc.greaming.domain.submission.enums.SubmissionField;
 import com.umc.greaming.domain.submission.enums.SubmissionVisibility;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Submission extends BaseEntity {
 
     @Id
@@ -26,7 +31,6 @@ public class Submission extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-/*
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
@@ -34,13 +38,12 @@ public class Submission extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "circle_id")
     private Circle circle;
-*/
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "thumbnail_url", nullable = false)
-    private String thumbnailUrl;
+    @Column(name = "thumbnail_key", nullable = false)
+    private String thumbnailKey;
 
     @Column(name = "caption", columnDefinition = "TEXT")
     private String caption;
@@ -77,7 +80,47 @@ public class Submission extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void update(String title, String caption, SubmissionVisibility visibility, Boolean commentEnabled, String thumbnailUrl) {
+    public void updateInfo(String title, String caption) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (caption != null) {
+            this.caption = caption;
+        }
+    }
+
+    public void updateVisibility(String visibilityStr) {
+        if (visibilityStr != null) {
+            try {
+                this.visibility = SubmissionVisibility.valueOf(visibilityStr);
+            } catch (IllegalArgumentException e) {
+            }
+        }
+    }
+
+    public void updateVisibility(SubmissionVisibility visibility) {
+        if (visibility != null) {
+            this.visibility = visibility;
+        }
+    }
+
+    public void changeCommentEnabled(Boolean commentEnabled) {
+        if (commentEnabled != null) {
+            this.commentEnabled = commentEnabled;
+        }
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public void increaseLikeCount() { this.likeCount++; }
+    public void decreaseLikeCount() { if (this.likeCount > 0) this.likeCount--; }
+
+    public void increaseCommentCount() { this.commentCount++; }
+    public void decreaseCommentCount() { if (this.commentCount > 0) this.commentCount--; }
+
+    public void update(String title, String caption, SubmissionVisibility visibility, Boolean commentEnabled, String thumbnailKey) {
         if (title != null && !title.isBlank()) {
             this.title = title;
         }
@@ -90,8 +133,8 @@ public class Submission extends BaseEntity {
         if (commentEnabled != null) {
             this.commentEnabled = commentEnabled;
         }
-        if (thumbnailUrl != null && !thumbnailUrl.isBlank()) {
-            this.thumbnailUrl = thumbnailUrl;
+        if (thumbnailKey != null && !thumbnailKey.isBlank()) {
+            this.thumbnailKey = thumbnailKey;
         }
     }
 }

@@ -2,8 +2,8 @@ package com.umc.greaming.domain.user.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
 import com.umc.greaming.domain.auth.entity.Provider;
-import com.umc.greaming.domain.user.entity.enums.UserState;
-import com.umc.greaming.domain.user.entity.enums.Visibility;
+import com.umc.greaming.domain.user.enums.UserState;
+import com.umc.greaming.domain.user.enums.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +36,8 @@ public class User extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name="profile_image_url")
-    private String profileImageUrl;
+    @Column(name = "profile_image_key")
+    private String profileImageKey;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_state", nullable = false)
@@ -54,7 +54,7 @@ public class User extends BaseEntity {
     public void updateProfile(String nickname, String introduction, String profileImageUrl) {
         this.nickname = nickname;
         this.introduction = introduction;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageKey = profileImageUrl;
     }
 
     public void updateVisibility(Visibility visibility) {

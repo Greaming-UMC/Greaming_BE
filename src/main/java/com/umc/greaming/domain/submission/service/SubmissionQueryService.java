@@ -1,22 +1,25 @@
 package com.umc.greaming.domain.submission.service;
 
 import com.umc.greaming.common.exception.GeneralException;
+import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.common.status.error.ErrorStatus;
+import com.umc.greaming.domain.challenge.enums.JourneyLevel;
+import com.umc.greaming.domain.challenge.repository.WeeklyUserScoreRepository;
+import com.umc.greaming.domain.comment.dto.CommentInfo;
+import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.comment.entity.Comment;
+import com.umc.greaming.domain.comment.repository.CommentLikeRepository;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
-import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
 import com.umc.greaming.domain.submission.entity.Submission;
-import com.umc.greaming.domain.submission.entity.SubmissionImage;
 import com.umc.greaming.domain.submission.repository.SubmissionImageRepository;
+import com.umc.greaming.domain.submission.repository.SubmissionLikeRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionTagRepository;
 import com.umc.greaming.domain.tag.dto.TagInfo;
-import com.umc.greaming.domain.tag.entity.SubmissionTag;
-import com.umc.greaming.domain.tag.entity.Tag;
-import com.umc.greaming.domain.tag.repository.TagRepository;
+import com.umc.greaming.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,127 +37,114 @@ public class SubmissionQueryService {
 
     private final SubmissionRepository submissionRepository;
     private final SubmissionTagRepository submissionTagRepository;
-    private final CommentRepository commentRepository;
     private final SubmissionImageRepository submissionImageRepository;
-    private final TagRepository tagRepository;
+    private final SubmissionLikeRepository submissionLikeRepository;
+
+    private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+
+    private final WeeklyUserScoreRepository weeklyUserScoreRepository;
+    private final S3Service s3Service;
+
     private static final int PAGE_SIZE = 30;
 
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
-        List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
-        return SubmissionPreviewResponse.from(submission, tags);
-    }
 
-    public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
-        List<TagInfo> tagInfos = getTagInfos(submissionId);
-        SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission, tagInfos);
-
-        int pageIndex = (page > 0) ? page - 1 : 0;
-        Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("createdAt").descending());
-        Page<Comment> commentPage = commentRepository.findAllBySubmission(submission, pageable);
-
-        return SubmissionDetailResponse.from(submissionInfo, commentPage);
-    }
-
-    public SubmissionInfo getSubmissionInfo(Long submissionId) {
-        Submission submission = findSubmissionByIdOrThrow(submissionId);
-        List<TagInfo> tagInfos = getTagInfos(submissionId);
-        return createSubmissionInfoFromEntity(submission, tagInfos);
-    }
-
-    @Transactional
-    public SubmissionInfo updateSubmission(Long submissionId, SubmissionUpdateRequest request, Long userId) {
-
-        Submission submission = submissionRepository.findById(submissionId)
+        Submission submission = submissionRepository.findByIdWithUser(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
-
-        /*
-        if (!submission.getUser().getId().equals(userId)) {
-            throw new GeneralException(ErrorStatus.FORBIDDEN);
-        }
-        */
-
-        String newThumbnailUrl = null;
-
-        if (request.imageList() != null) {
-            submissionImageRepository.deleteAllBySubmission(submission);
-            // [수정] 삭제 쿼리를 즉시 실행하여 Unique Key 충돌 방지
-            submissionImageRepository.flush();
-
-            List<String> newImages = request.imageList();
-            for (int i = 0; i < newImages.size(); i++) {
-                SubmissionImage image = SubmissionImage.builder()
-                        .submission(submission)
-                        .imageUrl(newImages.get(i))
-                        .sortOrder(i + 1)
-                        .build();
-                submissionImageRepository.save(image);
-            }
-            if (!newImages.isEmpty()) {
-                newThumbnailUrl = newImages.get(0);
-            }
-        }
-
-        submission.update(
-                request.title(),
-                request.caption(),
-                request.visibility(),
-                request.commentEnabled(),
-                newThumbnailUrl
-        );
-
-        List<TagInfo> resultTags;
-        if (request.tags() != null) {
-            resultTags = updateTagsAndReturnInfo(submission, request.tags());
-        } else {
-            resultTags = getTagInfos(submissionId);
-        }
-
-        return createSubmissionInfoFromEntity(submission, resultTags);
+        List<String> tags = submissionTagRepository.findTagNamesBySubmissionId(submissionId);
+        String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
+        return SubmissionPreviewResponse.from(submission, thumbnailUrl, tags);
     }
 
-    private List<TagInfo> updateTagsAndReturnInfo(Submission submission, List<String> newTagNames) {
-        submissionTagRepository.deleteAllBySubmission(submission);
-        // [수정] 태그도 안전하게 즉시 삭제 반영
-        submissionTagRepository.flush();
+    public SubmissionDetailResponse getSubmissionDetail(Long submissionId, int page, User loginUser) {
 
-        List<TagInfo> updatedInfos = new ArrayList<>();
+        Submission submission = submissionRepository.findByIdWithUserAndChallenge(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+        SubmissionInfo submissionInfo = createSubmissionInfoFromEntity(submission, loginUser);
 
-        for (String tagName : newTagNames) {
-            Tag tag = tagRepository.findByName(tagName)
-                    .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build()));
+        Long userId = (loginUser != null) ? loginUser.getUserId() : null;
+        CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page, userId);
 
-            SubmissionTag submissionTag = SubmissionTag.builder()
-                    .submission(submission)
-                    .tag(tag)
-                    .build();
-            submissionTagRepository.save(submissionTag);
-            updatedInfos.add(TagInfo.from(tag));
-        }
-        return updatedInfos;
+        return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
     }
 
-    private List<TagInfo> getTagInfos(Long submissionId) {
-        return submissionTagRepository.findAllBySubmissionId(submissionId).stream()
-                .map(st -> TagInfo.from(st.getTag()))
-                .toList();
+    public CommentPageResponse getCommentList(Long submissionId, int page, Long userId) {
+
+        Submission submission = findSubmissionByIdOrThrow(submissionId);
+        return getCommentPageResponse(submission, page, userId);
     }
 
-    private SubmissionInfo createSubmissionInfoFromEntity(Submission submission, List<TagInfo> tags) {
-        Long submissionId = submission.getId();
-        List<String> sortedImages = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
-                .stream()
-                .map(SubmissionImage::getImageUrl)
-                .toList();
+    public SubmissionInfo getSubmissionInfo(Long submissionId, User loginUser) {
 
-        boolean isLiked = false;
-
-        return SubmissionInfo.from(submission, sortedImages, tags, isLiked);
+        Submission submission = submissionRepository.findByIdWithUserAndChallenge(submissionId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+        return createSubmissionInfoFromEntity(submission, loginUser);
     }
 
     private Submission findSubmissionByIdOrThrow(Long submissionId) {
         return submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+    }
+
+    private CommentPageResponse getCommentPageResponse(Submission submission, int page, Long userId) {
+        int pageIndex = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by("createdAt").descending());
+
+        Page<Comment> commentEntityPage = commentRepository.findAllBySubmission(submission, pageable);
+
+        List<Long> likedCommentIds = List.of();
+        if (userId != null && !commentEntityPage.isEmpty()) {
+            List<Long> commentIds = commentEntityPage.getContent().stream()
+                    .map(Comment::getId)
+                    .toList();
+            likedCommentIds = commentLikeRepository.findLikedCommentIdsByUserIdAndCommentIds(userId, commentIds);
+        }
+        
+        final List<Long> finalLikedCommentIds = likedCommentIds;
+
+        List<CommentInfo> commentInfos = commentEntityPage.getContent().stream()
+                .map(comment -> {
+                    String profileUrl = s3Service.getPublicUrl(comment.getUser().getProfileImageKey());
+
+                    boolean isCommentLiked = finalLikedCommentIds.contains(comment.getId());
+
+                    boolean isWriter = (userId != null) && comment.getUser().getUserId().equals(userId);
+
+                    return CommentInfo.from(comment, profileUrl, isCommentLiked, isWriter);
+                })
+                .toList();
+
+        return CommentPageResponse.from(commentEntityPage, commentInfos);
+    }
+
+    private SubmissionInfo createSubmissionInfoFromEntity(Submission submission, User loginUser) {
+        Long submissionId = submission.getId();
+
+        List<String> sortedImageUrls = submissionImageRepository.findAllBySubmissionIdOrderBySortOrderAsc(submissionId)
+                .stream()
+                .map(image -> s3Service.getPublicUrl(image.getImageKey()))
+                .toList();
+
+        List<TagInfo> tagInfos = submissionTagRepository.findAllBySubmissionId(submissionId)
+                .stream()
+                .map(submissionTag -> TagInfo.from(submissionTag.getTag()))
+                .toList();
+
+        String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+
+        String level = JourneyLevel.SKETCHER.name();
+        if (submission.getChallenge() != null) {
+            level = weeklyUserScoreRepository.findByUserAndChallenge(submission.getUser(), submission.getChallenge())
+                    .map(score -> score.getJourneyLevel().name())
+                    .orElse(JourneyLevel.SKETCHER.name());
+        }
+
+        boolean isLiked = false;
+        if (loginUser != null) {
+            isLiked = submissionLikeRepository.existsByUserAndSubmission(loginUser, submission);
+        }
+
+        return SubmissionInfo.from(submission, profileImageUrl, level, sortedImageUrls, tagInfos, isLiked);
     }
 }

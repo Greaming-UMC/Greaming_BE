@@ -1,5 +1,6 @@
 package com.umc.greaming.domain.submission.repository;
 
+import com.umc.greaming.domain.submission.entity.Submission; // [추가]
 import com.umc.greaming.domain.submission.entity.Submission;
 import com.umc.greaming.domain.submission.entity.SubmissionImage;
 import org.springframework.data.jpa.repository.JpaRepository;

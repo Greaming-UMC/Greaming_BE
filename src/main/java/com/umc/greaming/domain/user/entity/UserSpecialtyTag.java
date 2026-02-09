@@ -1,7 +1,7 @@
-package com.umc.greaming.domain.tag.entity;
+package com.umc.greaming.domain.user.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
-import com.umc.greaming.domain.user.entity.User;
+import com.umc.greaming.domain.tag.entity.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 
