@@ -25,6 +25,9 @@ public class Circle extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "profile_image_key", length = 255)
+    private String profileImageKey;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User leader;
