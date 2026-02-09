@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-public class UserController {
+public class UserController implements UserApi {
 
     private final UserService userService;
 
+    @Override
     @PostMapping("/registinfo")
     public ResponseEntity<ApiResponse<Void>> registInfo(
             @AuthenticationPrincipal Long userId,

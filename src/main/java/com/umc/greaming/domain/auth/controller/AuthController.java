@@ -21,11 +21,12 @@ import java.util.Arrays;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final AuthService authService;
     private final CookieConfig cookieConfig;
 
+    @Override
     @GetMapping("/test")
     public ResponseEntity<Long> getUserId(@AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(userId);
@@ -38,6 +39,7 @@ public class AuthController {
      * @return 새로운 액세스 토큰
      * @throws GeneralException 리프레시 토큰이 없는 경우
      */
+    @Override
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<TokenResponse>> reissueToken(
             HttpServletRequest request,
@@ -85,6 +87,7 @@ public class AuthController {
      * @return 로그아웃 성공 응답
      * @throws GeneralException 인증 정보가 없는 경우 (UNAUTHORIZED)
      */
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @AuthenticationPrincipal Long userId,
