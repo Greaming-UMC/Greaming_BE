@@ -39,7 +39,7 @@ public record RegistInfoRequest(
 
     @Schema(description = "관심 분야 상세 정보")
     public record InterestInfo(
-            @Schema(description = "관심 분야 목록", example = "[\"WATERCOLOR\", \"PENCIL\"]")
+            @Schema(description = "관심 분야 목록", example = "[\"LANDSCAPE\", \"PORTRAIT\"]")
             List<ArtField> fields,
 
             @Schema(description = "관심 스타일", example = "WATERCOLOR")
