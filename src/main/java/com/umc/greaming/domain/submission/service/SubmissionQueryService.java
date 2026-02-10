@@ -79,11 +79,9 @@ public class SubmissionQueryService {
         Page<Submission> submissionPage;
         
         if ("recommend".equals(sortBy)) {
-            // 추천순: Repository의 추천 쿼리 사용
             Pageable pageable = PageRequest.of(page - 1, validatedSize);
             submissionPage = submissionRepository.findAllOrderByRecommend(pageable);
         } else {
-            // 일반 정렬
             Sort sort = getSortCriteria(sortBy);
             Pageable pageable = PageRequest.of(page - 1, validatedSize, sort);
             submissionPage = submissionRepository.findAllByIsDeletedFalse(pageable);
@@ -100,9 +98,6 @@ public class SubmissionQueryService {
         return HomeSubmissionsResponse.from(submissionPage, cards);
     }
 
-    /**
-     * 정렬 기준 설정
-     */
     private Sort getSortCriteria(String sortBy) {
         return switch (sortBy) {
             case "latest" -> Sort.by(Sort.Direction.DESC, "createdAt");

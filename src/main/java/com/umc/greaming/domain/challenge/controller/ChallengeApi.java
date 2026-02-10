@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -144,6 +145,10 @@ public interface ChallengeApi {
             - `DAILY`: 데일리 챌린지
             - `WEEKLY`: 주간 챌린지
             
+            **날짜 형식:**
+            - ISO 8601 형식: `2024-02-10T00:00:00`
+            - 또는 날짜만: `2024-02-10` (자동으로 00:00:00 추가)
+            
             **정렬 기준 (sortBy):**
             - `latest`: 최신순 (기본값)
             - `popular`: 인기순 (좋아요 많은 순)
@@ -236,8 +241,8 @@ public interface ChallengeApi {
             @Parameter(description = "챌린지 타입 (DAILY, WEEKLY)", required = true, example = "DAILY") 
             @RequestParam String challengeType,
             
-            @Parameter(description = "조회할 날짜", required = true) 
-            @RequestParam LocalDateTime dateTime,
+            @Parameter(description = "조회할 날짜 (ISO 8601 형식)", required = true, example = "2024-02-10T00:00:00") 
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
             
             @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") 
             @RequestParam(defaultValue = "1") @Positive int page,
