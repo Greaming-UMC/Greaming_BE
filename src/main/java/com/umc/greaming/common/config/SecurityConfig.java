@@ -34,6 +34,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-resources/**",
             "/webjars/**",
+
+            //홈화면 퍼블릭으로 추가하였습니다 - mybookG
             "/api/home/**",
             "/api/challenges/**",
             "/api/submissions"
