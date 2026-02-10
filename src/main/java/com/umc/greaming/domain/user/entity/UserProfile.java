@@ -28,4 +28,9 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "weekly_goal_score", nullable = false)
     private Integer weeklyGoalScore;
+
+    public void updateInfo(UsagePurpose usagePurpose, Integer weeklyGoalScore) {
+        if (usagePurpose != null) this.usagePurpose = usagePurpose;
+        if (weeklyGoalScore != null) this.weeklyGoalScore = weeklyGoalScore;
+    }
 }

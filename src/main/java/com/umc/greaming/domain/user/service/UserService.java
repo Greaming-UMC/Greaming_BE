@@ -5,6 +5,7 @@ import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.domain.tag.entity.Tag;
 import com.umc.greaming.domain.tag.repository.TagRepository;
 import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
+import com.umc.greaming.domain.user.dto.request.UpdateUserInfoRequest;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.entity.UserInterestTag;
 import com.umc.greaming.domain.user.entity.UserProfile;
@@ -31,15 +32,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public boolean isProfileRegistered(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
         return user.isProfileRegistered();
     }
 
     @Transactional
     public void registInfo(Long userId, RegistInfoRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         if (user.isProfileRegistered()) {
             throw new GeneralException(ErrorStatus.USER_ALREADY_REGISTERED);
@@ -53,14 +52,41 @@ public class UserService {
 
         userProfileRepository.save(userProfile);
 
-        saveTags(user, request.specialtyTags(), request.interestTags());
+        saveSpecialtyTags(user, request.specialtyTags());
+        saveInterestTags(user, request.interestTags());
 
         user.registerProfile(request.nickname(), request.intro());
     }
 
-    private void saveTags(User user, List<String> specialtyTagNames, List<String> interestTagNames) {
-        if (specialtyTagNames != null) {
-            for (String tagName : specialtyTagNames) {
+    @Transactional
+    public void updateInfo(Long userId, UpdateUserInfoRequest request) {
+        User user = findUser(userId);
+        UserProfile profile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
+
+        user.updateInfo(request.nickname(), request.intro());
+        profile.updateInfo(request.usagePurpose(), request.weeklyGoalScore());
+
+        if (request.specialtyTags() != null) {
+            userSpecialtyTagRepository.deleteAllByUser(user);
+            userSpecialtyTagRepository.flush();
+            saveSpecialtyTags(user, request.specialtyTags());
+        }
+        if (request.interestTags() != null) {
+            userInterestTagRepository.deleteAllByUser(user);
+            userInterestTagRepository.flush();
+            saveInterestTags(user, request.interestTags());
+        }
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    private void saveSpecialtyTags(User user, List<String> tagNames) {
+        if (tagNames != null) {
+            for (String tagName : tagNames) {
                 Tag tag = tagRepository.findByName(tagName)
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build()));
                 userSpecialtyTagRepository.save(
@@ -68,9 +94,11 @@ public class UserService {
                 );
             }
         }
+    }
 
-        if (interestTagNames != null) {
-            for (String tagName : interestTagNames) {
+    private void saveInterestTags(User user, List<String> tagNames) {
+        if (tagNames != null) {
+            for (String tagName : tagNames) {
                 Tag tag = tagRepository.findByName(tagName)
                         .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build()));
                 userInterestTagRepository.save(
