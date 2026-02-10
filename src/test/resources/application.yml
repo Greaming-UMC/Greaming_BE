@@ -12,10 +12,10 @@ spring:
   # 테스트용 S3 설정 (실제 연결하지 않음)
   cloud:
     aws:
+      region:
+        static: ap-northeast-2
       s3:
         bucket: test-bucket
-        region:
-          static: ap-northeast-2
 
   datasource:
     driver-class-name: org.h2.Driver
