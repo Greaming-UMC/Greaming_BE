@@ -1,14 +1,9 @@
 package com.umc.greaming.domain.user.entity;
 
 import com.umc.greaming.common.base.BaseEntity;
-import com.umc.greaming.domain.user.entity.enums.ArtField;
-import com.umc.greaming.domain.user.entity.enums.ArtStyle;
 import com.umc.greaming.domain.user.entity.enums.UsagePurpose;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "user_profile")
@@ -34,25 +29,8 @@ public class UserProfile extends BaseEntity {
     @Column(name = "weekly_goal_score", nullable = false)
     private Integer weeklyGoalScore;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "specialty_style", nullable = false)
-    private ArtStyle specialtyStyle;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "interest_style", nullable = false)
-    private ArtStyle interestStyle;
-
-    @ElementCollection(targetClass = ArtField.class)
-    @CollectionTable(name = "user_specialty_field", joinColumns = @JoinColumn(name = "user_profile_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "art_field")
-    @Builder.Default
-    private List<ArtField> specialtyFields = new ArrayList<>();
-
-    @ElementCollection(targetClass = ArtField.class)
-    @CollectionTable(name = "user_interest_field", joinColumns = @JoinColumn(name = "user_profile_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "art_field")
-    @Builder.Default
-    private List<ArtField> interestFields = new ArrayList<>();
+    public void updateInfo(UsagePurpose usagePurpose, Integer weeklyGoalScore) {
+        if (usagePurpose != null) this.usagePurpose = usagePurpose;
+        if (weeklyGoalScore != null) this.weeklyGoalScore = weeklyGoalScore;
+    }
 }

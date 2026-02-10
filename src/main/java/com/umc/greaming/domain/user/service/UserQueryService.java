@@ -6,9 +6,12 @@ import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.follow.enums.FollowState;
 import com.umc.greaming.domain.follow.repository.FollowRepository;
 import com.umc.greaming.domain.user.repository.UserInterestTagRepository;
+import com.umc.greaming.domain.user.repository.UserProfileRepository;
 import com.umc.greaming.domain.user.repository.UserSpecialtyTagRepository;
 import com.umc.greaming.domain.user.dto.response.MyProfileTopResponse;
+import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
 import com.umc.greaming.domain.user.entity.User;
+import com.umc.greaming.domain.user.entity.UserProfile;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.List;
 public class UserQueryService {
 
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final FollowRepository followRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
@@ -60,6 +64,27 @@ public class UserQueryService {
                         .weeklyChallenge(weeklyChallenge)
                         .build())
                 .build();
+    }
+
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        UserProfile profile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
+
+        List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
+        List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
+
+        return new UserInfoResponse(
+                user.getNickname(),
+                user.getIntroduction(),
+                resolvePublicUrl(user.getProfileImageKey()),
+                specialtyTags,
+                interestTags,
+                profile.getUsagePurpose(),
+                profile.getWeeklyGoalScore()
+        );
     }
 
     private String resolvePublicUrl(String key) {

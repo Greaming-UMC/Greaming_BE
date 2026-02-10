@@ -80,4 +80,9 @@ public class User extends BaseEntity {
         this.introduction = introduction;
         this.profileRegistered = true;
     }
+
+    public void updateInfo(String nickname, String introduction) {
+        if (nickname != null) this.nickname = nickname;
+        if (introduction != null) this.introduction = introduction;
+    }
 }

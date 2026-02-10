@@ -5,6 +5,7 @@ import com.umc.greaming.domain.auth.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -70,6 +71,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/api/submissions/*/preview"  // 게시글 미리보기는 공개
+                        ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/user/*/info"  // 유저 정보 조회는 공개
                         ).permitAll()
                         .requestMatchers(
                                 "/actuator/**"

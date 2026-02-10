@@ -34,6 +34,7 @@ public enum ErrorStatus implements BaseStatus {
 
     //user
     USER_ALREADY_REGISTERED("USER_409", HttpStatus.CONFLICT, "이미 정보가 등록된 유저입니다."),
+    USER_PROFILE_NOT_FOUND("USER_404", HttpStatus.NOT_FOUND, "프로필 정보를 먼저 등록해주세요."),
 
     //작품 미리보기
     SUBMISSION_NOT_FOUND("SUBMISSION_404", HttpStatus.NOT_FOUND, "작품을 찾을 수 없습니다."),
