@@ -10,8 +10,10 @@ import com.umc.greaming.domain.user.repository.UserProfileRepository;
 import com.umc.greaming.domain.user.repository.UserSpecialtyTagRepository;
 import com.umc.greaming.domain.user.dto.response.MyProfileTopResponse;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
+import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.entity.UserProfile;
+import com.umc.greaming.domain.user.enums.UserState;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -85,6 +87,11 @@ public class UserQueryService {
                 profile.getUsagePurpose(),
                 profile.getWeeklyGoalScore()
         );
+    }
+
+    public UserSearchResponse searchByNickname(String nickname) {
+        List<User> users = userRepository.findByNicknameContainingAndUserState(nickname, UserState.ACTIVE);
+        return UserSearchResponse.from(users, this::resolvePublicUrl);
     }
 
     private String resolvePublicUrl(String key) {

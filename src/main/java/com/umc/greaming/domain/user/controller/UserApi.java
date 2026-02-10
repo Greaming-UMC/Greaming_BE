@@ -4,6 +4,7 @@ import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
 import com.umc.greaming.domain.user.dto.request.UpdateUserInfoRequest;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
+import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -305,5 +306,125 @@ public interface UserApi {
     @GetMapping("/{userId}/info")
     ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(
             @Parameter(description = "조회할 유저 ID") @PathVariable Long userId
+    );
+
+    @Operation(
+            summary = "닉네임으로 유저 검색",
+            description = """
+                    닉네임 키워드로 유저를 검색하여 유저 ID 목록을 반환합니다.
+
+                    - 닉네임에 키워드가 포함된 ACTIVE 상태의 유저를 검색합니다.
+                    - 인증이 필요합니다.
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "유저 검색 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "유저 검색 성공",
+                                      "result": {
+                                        "users": [
+                                          {
+                                            "userId": 1,
+                                            "nickname": "그림쟁이",
+                                            "profileImgUrl": "https://s3.amazonaws.com/..."
+                                          },
+                                          {
+                                            "userId": 5,
+                                            "nickname": "그림그리는사람",
+                                            "profileImgUrl": null
+                                          }
+                                        ]
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMM_401",
+                                      "message": "인증이 필요합니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/search")
+    ResponseEntity<ApiResponse<UserSearchResponse>> searchByNickname(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId,
+            @Parameter(description = "검색할 닉네임 키워드", example = "그림") @RequestParam String nickname
+    );
+
+    @Operation(
+            summary = "본인 여부 확인",
+            description = """
+                    주어진 유저 ID가 현재 로그인한 사용자 본인인지 확인합니다.
+
+                    - `isMe: true`이면 본인, `false`이면 다른 사용자입니다.
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "본인 여부 확인 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "본인 여부 확인 성공",
+                                      "result": {
+                                        "isMe": true
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMM_401",
+                                      "message": "인증이 필요합니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/{targetUserId}/is-me")
+    ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> checkIsMe(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId,
+            @Parameter(description = "확인할 유저 ID") @PathVariable Long targetUserId
     );
 }
