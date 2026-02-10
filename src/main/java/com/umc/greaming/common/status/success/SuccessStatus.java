@@ -45,6 +45,12 @@ public enum SuccessStatus implements BaseStatus {
     USER_REGIST_INFO_SUCCESS("USER_200", HttpStatus.OK, "최초 유저 정보 등록 성공"),
     USER_CHECK_REGISTERED_SUCCESS("USER_200", HttpStatus.OK, "프로필 등록 여부 조회 성공"),
 
+    //홈
+    HOME_SUCCESS("HOME_200", HttpStatus.OK , "홈화면 조회 성공" ),
+
+    //챌린지
+    CHALLENGE_SUBMISSIONS_SUCCESS("CHALLENGE_200", HttpStatus.OK, "챌린지 게시물 목록 조회 성공"),
+
     //s3
     S3_UPLOAD_SUCCESS("S3_200", HttpStatus.OK, "Presigned URL 발급 성공");
 

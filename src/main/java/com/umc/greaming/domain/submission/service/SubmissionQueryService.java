@@ -10,6 +10,8 @@ import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.comment.repository.CommentLikeRepository;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionCard;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -47,6 +50,7 @@ public class SubmissionQueryService {
     private final S3Service s3Service;
 
     private static final int PAGE_SIZE = 30;
+    private static final int MAX_PAGE_SIZE = 50;
 
     public SubmissionPreviewResponse getSubmissionPreview(Long submissionId) {
 
@@ -67,6 +71,40 @@ public class SubmissionQueryService {
         CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page, userId);
 
         return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
+    }
+
+    public HomeSubmissionsResponse getHomeSubmissions(int page, int size, String sortBy) {
+        int validatedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        
+        Page<Submission> submissionPage;
+        
+        if ("recommend".equals(sortBy)) {
+            Pageable pageable = PageRequest.of(page - 1, validatedSize);
+            submissionPage = submissionRepository.findAllOrderByRecommend(pageable);
+        } else {
+            Sort sort = getSortCriteria(sortBy);
+            Pageable pageable = PageRequest.of(page - 1, validatedSize, sort);
+            submissionPage = submissionRepository.findAllByIsDeletedFalse(pageable);
+        }
+
+        List<HomeSubmissionCard> cards = submissionPage.getContent().stream()
+                .map(submission -> {
+                    String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
+                    String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+                    return HomeSubmissionCard.from(submission, thumbnailUrl, profileImageUrl);
+                })
+                .toList();
+
+        return HomeSubmissionsResponse.from(submissionPage, cards);
+    }
+
+    private Sort getSortCriteria(String sortBy) {
+        return switch (sortBy) {
+            case "latest" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case "popular" -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case "bookmarks" -> Sort.by(Sort.Direction.DESC, "bookmarkCount");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
     }
 
     public CommentPageResponse getCommentList(Long submissionId, int page, Long userId) {

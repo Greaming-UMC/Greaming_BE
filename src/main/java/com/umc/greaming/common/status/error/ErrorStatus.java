@@ -45,6 +45,9 @@ public enum ErrorStatus implements BaseStatus {
     // [추천] 답글 전용 에러가 필요하다면 (선택)
     REPLY_NOT_FOUND("REPLY_404", HttpStatus.NOT_FOUND, "답글을 찾을 수 없습니다."),
 
+    // Challenge Errors
+    CHALLENGE_NOT_FOUND("CHALLENGE_404", HttpStatus.NOT_FOUND, "챌린지를 찾을 수 없습니다."),
+
     // Like (좋아요 - 추후 구현 대비)
     ALREADY_LIKED("LIKE_409", HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다."),
     SELF_LIKE_NOT_ALLOWED("LIKE_400", HttpStatus.BAD_REQUEST, "본인 글에는 좋아요를 누를 수 없습니다."),
