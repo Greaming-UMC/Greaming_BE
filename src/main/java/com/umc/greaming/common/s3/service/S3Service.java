@@ -22,7 +22,7 @@ public class S3Service {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
 
-    @Value("${spring.cloud.aws.s3.region.static}")
+    @Value("${spring.cloud.aws.region.static}")
     private String region;
 
     // 공개 버킷용 String 합치기
