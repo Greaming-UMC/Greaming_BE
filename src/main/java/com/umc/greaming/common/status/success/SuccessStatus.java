@@ -51,6 +51,9 @@ public enum SuccessStatus implements BaseStatus {
     //챌린지
     CHALLENGE_SUBMISSIONS_SUCCESS("CHALLENGE_200", HttpStatus.OK, "챌린지 게시물 목록 조회 성공"),
 
+    //캘린더 조회
+    CALENDAR_GET_SUCCESS("CALENDAR_200", HttpStatus.OK, "유저 캘린더 조회 성공"),
+
     //s3
     S3_UPLOAD_SUCCESS("S3_200", HttpStatus.OK, "Presigned URL 발급 성공");
 
