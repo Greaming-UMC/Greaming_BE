@@ -1,7 +1,9 @@
 package com.umc.greaming.domain.submission.controller;
 
 import com.umc.greaming.common.response.ApiResponse;
+import com.umc.greaming.domain.challenge.dto.response.ChallengeSubmissionsResponse;
 import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
@@ -15,6 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +29,84 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("/api/submissions")
 public interface SubmissionApi {
+
+    // 0. 모든 게시글 목록 조회 (홈 화면용)
+    @Operation(summary = "모든 게시글 목록 조회", description = """
+            홈 화면에서 모든 게시글을 페이지네이션으로 조회합니다.
+            
+            **정렬 기준 (sortBy):**
+            - `latest`: 최신순 (기본값)
+            - `popular`: 인기순 (좋아요 많은 순)
+            - `bookmarks`: 북마크 많은 순
+            - `recommend`: 추천순 (좋아요*2 + 댓글*3 + 북마크*5)
+            
+            **페이지 사이즈:**
+            - 기본값: 50
+            - 최소: 1
+            - 최대: 50
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "게시글 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "SUBMISSION_200",
+                                      "message": "게시글 목록 조회 성공",
+                                      "result": {
+                                        "submissions": [
+                                          {
+                                            "submissionId": 100,
+                                            "thumbnailUrl": "https://s3.../thumbnail.jpg",
+                                            "userId": 1,
+                                            "nickname": "그림쟁이",
+                                            "profileImageUrl": "https://s3.../profile.jpg",
+                                            "likesCount": 10,
+                                            "commentCount": 5,
+                                            "bookmarkCount": 15
+                                          },
+                                          {
+                                            "submissionId": 99,
+                                            "thumbnailUrl": "https://s3.../thumbnail2.jpg",
+                                            "userId": 2,
+                                            "nickname": "화가",
+                                            "profileImageUrl": "https://s3.../profile2.jpg",
+                                            "likesCount": 8,
+                                            "commentCount": 3,
+                                            "bookmarkCount": 12
+                                          }
+                                        ],
+                                        "pageInfo": {
+                                          "currentPage": 1,
+                                          "pageSize": 50,
+                                          "totalPages": 4,
+                                          "totalElements": 200,
+                                          "isLast": false,
+                                          "isFirst": true
+                                        }
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping
+    ResponseEntity<ApiResponse<HomeSubmissionsResponse>> getAllSubmissions(
+            @Parameter(description = "페이지 번호 (1부터 시작)", example = "1")
+            @RequestParam(defaultValue = "1") @Positive int page,
+            
+            @Parameter(description = "페이지 사이즈 (1-50)", example = "50")
+            @RequestParam(defaultValue = "50") @Min(1) @Max(50) int size,
+            
+            @Parameter(description = "정렬 기준 (latest, popular, bookmarks, recommend)", example = "latest")
+            @RequestParam(defaultValue = "latest") String sortBy
+    );
 
     // 1. 게시글 생성
     @Operation(summary = "게시글 생성", description = """

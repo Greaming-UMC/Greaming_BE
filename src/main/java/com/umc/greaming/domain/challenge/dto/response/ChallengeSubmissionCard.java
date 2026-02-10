@@ -14,9 +14,17 @@ public record ChallengeSubmissionCard(
         @JsonProperty("thumbnailUrl")
         String thumbnailUrl,
 
+        @Schema(description = "작성자 ID", example = "1")
+        @JsonProperty("userId")
+        Long userId,
+
         @Schema(description = "작성자 닉네임", example = "그림쟁이")
         @JsonProperty("nickname")
         String nickname,
+
+        @Schema(description = "작성자 프로필 이미지 URL", example = "https://s3.../profile.jpg")
+        @JsonProperty("profileImageUrl")
+        String profileImageUrl,
 
         @Schema(description = "좋아요 수", example = "10")
         @JsonProperty("likesCount")
@@ -30,11 +38,13 @@ public record ChallengeSubmissionCard(
         @JsonProperty("bookmarkCount")
         Integer bookmarkCount
 ) {
-    public static ChallengeSubmissionCard from(Submission submission, String thumbnailUrl) {
+    public static ChallengeSubmissionCard from(Submission submission, String thumbnailUrl, String profileImageUrl) {
         return new ChallengeSubmissionCard(
                 submission.getId(),
                 thumbnailUrl,
+                submission.getUser().getUserId(),
                 submission.getUser().getNickname(),
+                profileImageUrl,
                 submission.getLikeCount(),
                 submission.getCommentCount(),
                 submission.getBookmarkCount()

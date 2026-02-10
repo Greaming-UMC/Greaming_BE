@@ -33,7 +33,10 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/api/home/**",
+            "/api/challenges/**",
+            "/api/submissions"
     };
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

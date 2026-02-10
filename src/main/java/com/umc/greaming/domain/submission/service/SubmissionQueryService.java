@@ -3,10 +3,6 @@ package com.umc.greaming.domain.submission.service;
 import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.common.status.error.ErrorStatus;
-import com.umc.greaming.domain.challenge.dto.response.ChallengeSubmissionCard;
-import com.umc.greaming.domain.challenge.dto.response.ChallengeSubmissionsResponse;
-import com.umc.greaming.domain.challenge.entity.Challenge;
-import com.umc.greaming.domain.challenge.enums.Cycle;
 import com.umc.greaming.domain.challenge.enums.JourneyLevel;
 import com.umc.greaming.domain.challenge.repository.WeeklyUserScoreRepository;
 import com.umc.greaming.domain.comment.dto.CommentInfo;
@@ -14,6 +10,8 @@ import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.comment.entity.Comment;
 import com.umc.greaming.domain.comment.repository.CommentLikeRepository;
 import com.umc.greaming.domain.comment.repository.CommentRepository;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionCard;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
@@ -32,7 +30,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -76,33 +73,43 @@ public class SubmissionQueryService {
         return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
     }
 
-    public SubmissionsHomeResponse getHomeSubmissionss(
-            int page,
-            int size,
-            String sortBy
-    ) {
-
+    public HomeSubmissionsResponse getHomeSubmissions(int page, int size, String sortBy) {
         int validatedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
-        int pageIndex = Math.max(0, page - 1);
+        
         Page<Submission> submissionPage;
-
+        
         if ("recommend".equals(sortBy)) {
-            Pageable pageable = PageRequest.of(pageIndex, validatedSize);
+            // 추천순: Repository의 추천 쿼리 사용
+            Pageable pageable = PageRequest.of(page - 1, validatedSize);
             submissionPage = submissionRepository.findAllOrderByRecommend(pageable);
         } else {
+            // 일반 정렬
             Sort sort = getSortCriteria(sortBy);
-            Pageable pageable = PageRequest.of(pageIndex, validatedSize, sort);
-            submissionPage = submissionRepository.findAllByChallengeId(challenge.getId(), pageable);
+            Pageable pageable = PageRequest.of(page - 1, validatedSize, sort);
+            submissionPage = submissionRepository.findAllByIsDeletedFalse(pageable);
         }
 
-        List<ChallengeSubmissionCard> cards = submissionPage.getContent().stream()
+        List<HomeSubmissionCard> cards = submissionPage.getContent().stream()
                 .map(submission -> {
                     String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
-                    return ChallengeSubmissionCard.from(submission, thumbnailUrl);
+                    String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+                    return HomeSubmissionCard.from(submission, thumbnailUrl, profileImageUrl);
                 })
                 .toList();
 
-        return ChallengeSubmissionsResponse.from(submissionPage, cards);
+        return HomeSubmissionsResponse.from(submissionPage, cards);
+    }
+
+    /**
+     * 정렬 기준 설정
+     */
+    private Sort getSortCriteria(String sortBy) {
+        return switch (sortBy) {
+            case "latest" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case "popular" -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case "bookmarks" -> Sort.by(Sort.Direction.DESC, "bookmarkCount");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
     }
 
     public CommentPageResponse getCommentList(Long submissionId, int page, Long userId) {

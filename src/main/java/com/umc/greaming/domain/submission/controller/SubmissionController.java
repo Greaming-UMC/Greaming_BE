@@ -5,6 +5,7 @@ import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
+import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
@@ -32,6 +33,16 @@ public class SubmissionController implements SubmissionApi {
     private final SubmissionQueryService submissionQueryService;
     private final SubmissionCommandService submissionCommandService;
     private final UserRepository userRepository;
+
+    @Override
+    public ResponseEntity<ApiResponse<HomeSubmissionsResponse>> getAllSubmissions(
+            int page,
+            int size,
+            String sortBy
+    ) {
+        HomeSubmissionsResponse result = submissionQueryService.getHomeSubmissions(page, size, sortBy);
+        return ApiResponse.success(SuccessStatus.SUBMISSION_DETAIL_SUCCESS, result);
+    }
 
     @Override
     public ResponseEntity<ApiResponse<SubmissionPreviewResponse>> getSubmissionPreview(

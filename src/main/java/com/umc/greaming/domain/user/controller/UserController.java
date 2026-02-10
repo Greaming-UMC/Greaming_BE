@@ -29,7 +29,6 @@ public class UserController implements UserApi {
                 Map.of("profileRegistered", registered)
         );
     }
-
     @Override
     @PostMapping("/registinfo")
     public ResponseEntity<ApiResponse<Void>> registInfo(

@@ -23,15 +23,23 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT s FROM Submission s " +
            "JOIN FETCH s.user " +
            "WHERE s.challenge.id = :challengeId " +
-           "AND s.deletedAt != null ")
+           "AND s.deletedAt IS NULL")
     Page<Submission> findAllByChallengeId(@Param("challengeId") Long challengeId, Pageable pageable);
 
     @Query("SELECT s FROM Submission s " +
             "WHERE s.challenge.id = :challengeId " +
+            "AND s.deletedAt IS NULL " +
             "ORDER BY (s.likeCount * 2 + s.commentCount * 3 + s.bookmarkCount * 5) DESC, s.createdAt DESC")
     Page<Submission> findAllByChallengeIdOrderByRecommend(@Param("challengeId") Long challengeId, Pageable pageable);
 
     @Query("SELECT s FROM Submission s " +
+            "JOIN FETCH s.user " +
+            "WHERE s.deletedAt IS NULL " +
             "ORDER BY (s.likeCount * 2 + s.commentCount * 3 + s.bookmarkCount * 5) DESC, s.createdAt DESC")
     Page<Submission> findAllOrderByRecommend(Pageable pageable);
+
+    @Query("SELECT s FROM Submission s " +
+           "JOIN FETCH s.user " +
+           "WHERE s.deletedAt IS NULL")
+    Page<Submission> findAllByIsDeletedFalse(Pageable pageable);
 }

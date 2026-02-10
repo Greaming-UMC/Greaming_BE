@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +30,6 @@ public class ChallengeQueryService {
     private final SubmissionRepository submissionRepository;
     private final S3Service s3Service;
 
-    private static final int DEFAULT_PAGE_SIZE = 5;
     private static final int MAX_PAGE_SIZE = 50;
 
     public ChallengeSubmissionsResponse getCurrentChallengeSubmissions(String challengeType, int page, int size) {
@@ -56,7 +54,8 @@ public class ChallengeQueryService {
         List<ChallengeSubmissionCard> cards = submissionPage.getContent().stream()
                 .map(submission -> {
                     String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
-                    return ChallengeSubmissionCard.from(submission, thumbnailUrl);
+                    String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+                    return ChallengeSubmissionCard.from(submission, thumbnailUrl, profileImageUrl);
                 })
                 .toList();
 
@@ -96,7 +95,8 @@ public class ChallengeQueryService {
         List<ChallengeSubmissionCard> cards = submissionPage.getContent().stream()
                 .map(submission -> {
                     String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
-                    return ChallengeSubmissionCard.from(submission, thumbnailUrl);
+                    String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+                    return ChallengeSubmissionCard.from(submission, thumbnailUrl, profileImageUrl);
                 })
                 .toList();
 
