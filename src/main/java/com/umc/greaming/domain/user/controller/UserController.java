@@ -5,6 +5,7 @@ import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
 import com.umc.greaming.domain.user.dto.request.UpdateUserInfoRequest;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
+import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.service.UserQueryService;
 import com.umc.greaming.domain.user.service.UserService;
 import jakarta.validation.Valid;
@@ -61,5 +62,25 @@ public class UserController implements UserApi {
     ) {
         UserInfoResponse response = userQueryService.getUserInfo(userId);
         return ApiResponse.success(SuccessStatus.USER_GET_INFO_SUCCESS, response);
+    }
+
+    @Override
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<UserSearchResponse>> searchByNickname(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam String nickname
+    ) {
+        UserSearchResponse response = userQueryService.searchByNickname(nickname);
+        return ApiResponse.success(SuccessStatus.USER_SEARCH_SUCCESS, response);
+    }
+
+    @Override
+    @GetMapping("/{targetUserId}/is-me")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkIsMe(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long targetUserId
+    ) {
+        boolean isMe = userId.equals(targetUserId);
+        return ApiResponse.success(SuccessStatus.USER_CHECK_IS_ME_SUCCESS, Map.of("isMe", isMe));
     }
 }

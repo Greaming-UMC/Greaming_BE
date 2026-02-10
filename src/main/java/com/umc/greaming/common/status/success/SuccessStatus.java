@@ -46,6 +46,8 @@ public enum SuccessStatus implements BaseStatus {
     USER_CHECK_REGISTERED_SUCCESS("USER_200", HttpStatus.OK, "프로필 등록 여부 조회 성공"),
     USER_UPDATE_INFO_SUCCESS("USER_200", HttpStatus.OK, "유저 정보 수정 성공"),
     USER_GET_INFO_SUCCESS("USER_200", HttpStatus.OK, "유저 정보 조회 성공"),
+    USER_SEARCH_SUCCESS("USER_200", HttpStatus.OK, "유저 검색 성공"),
+    USER_CHECK_IS_ME_SUCCESS("USER_200", HttpStatus.OK, "본인 여부 확인 성공"),
 
     //홈
     HOME_SUCCESS("HOME_200", HttpStatus.OK , "홈화면 조회 성공" ),
