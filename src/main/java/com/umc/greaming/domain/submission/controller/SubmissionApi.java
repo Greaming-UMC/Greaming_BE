@@ -1,7 +1,6 @@
 package com.umc.greaming.domain.submission.controller;
 
 import com.umc.greaming.common.response.ApiResponse;
-import com.umc.greaming.domain.challenge.dto.response.ChallengeSubmissionsResponse;
 import com.umc.greaming.domain.comment.dto.response.CommentPageResponse;
 import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
