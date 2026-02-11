@@ -1,12 +1,16 @@
 package com.umc.greaming.domain.user.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MyProfileTopResponse {
 
     private UserInformation userInformation;
@@ -14,6 +18,8 @@ public class MyProfileTopResponse {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserInformation {
         private String nickname;
         private String profileImgUrl;
@@ -27,6 +33,8 @@ public class MyProfileTopResponse {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ChallengeCalendar {
         private List<String> dailyChallenge;
         private List<String> weeklyChallenge;

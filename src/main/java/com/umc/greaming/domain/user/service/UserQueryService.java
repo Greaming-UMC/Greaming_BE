@@ -7,6 +7,7 @@ import com.umc.greaming.domain.follow.enums.FollowState;
 import com.umc.greaming.domain.follow.repository.FollowRepository;
 import com.umc.greaming.domain.user.repository.*;
 import com.umc.greaming.domain.user.dto.response.MyProfileTopResponse;
+import com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
 import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.entity.User;
@@ -32,25 +33,36 @@ public class UserQueryService {
     private final S3Service s3Service;
 
     public MyProfileTopResponse getMyProfileTop(Long userId) {
+        // userId null 체크
+        if (userId == null) {
+            throw new GeneralException(ErrorStatus.UNAUTHORIZED);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
+        // 팔로워/팔로잉 수 조회
         long followerCount = followRepository.countByFollowing_UserIdAndState(userId, FollowState.COMPLETED);
         long followingCount = followRepository.countByFollower_UserIdAndState(userId, FollowState.COMPLETED);
 
+        // 태그 조회
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
         List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
 
+        // 레벨 조회
         String level = userJournyRepository.findByUser(user)
                 .map(userJourny -> userJourny.getJourneyLevel().name())
                 .orElse("SKETCHER");
 
+        // 챌린지 캘린더 (임시 빈 리스트)
         List<String> dailyChallenge = List.of();
         List<String> weeklyChallenge = List.of();
 
+        // 프로필 이미지 URL
         String profileImgUrl = resolvePublicUrl(user.getProfileImageKey());
 
-        return MyProfileTopResponse.builder()
+        // 응답 생성
+        MyProfileTopResponse response = MyProfileTopResponse.builder()
                 .userInformation(MyProfileTopResponse.UserInformation.builder()
                         .nickname(user.getNickname())
                         .profileImgUrl(profileImgUrl)
@@ -58,14 +70,16 @@ public class UserQueryService {
                         .introduction(user.getIntroduction())
                         .followerCount(followerCount)
                         .followingCount(followingCount)
-                        .specialtyTags(specialtyTags)
-                        .interestTags(interestTags)
+                        .specialtyTags(specialtyTags != null ? specialtyTags : List.of())
+                        .interestTags(interestTags != null ? interestTags : List.of())
                         .build())
                 .challengeCalendar(MyProfileTopResponse.ChallengeCalendar.builder()
                         .dailyChallenge(dailyChallenge)
                         .weeklyChallenge(weeklyChallenge)
                         .build())
                 .build();
+
+        return response;
     }
 
     public UserInfoResponse getUserInfo(Long userId) {
@@ -92,6 +106,37 @@ public class UserQueryService {
     public UserSearchResponse searchByNickname(String nickname) {
         List<User> users = userRepository.findByNicknameContainingAndUserState(nickname, UserState.ACTIVE);
         return UserSearchResponse.from(users, this::resolvePublicUrl);
+    }
+
+    public boolean checkNicknameAvailability(String nickname) {
+        return !userRepository.findByNickname(nickname).isPresent();
+    }
+
+    public MyProfileSettingsResponse getMyProfileSettings(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        UserProfile profile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
+
+        List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
+        List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
+
+        String level = userJournyRepository.findByUser(user)
+                .map(userJourny -> userJourny.getJourneyLevel().name())
+                .orElse("SKETCHER");
+
+        String profileImgUrl = resolvePublicUrl(user.getProfileImageKey());
+
+        return MyProfileSettingsResponse.builder()
+                .nickname(user.getNickname())
+                .profileImgUrl(profileImgUrl)
+                .level(level)
+                .introduction(user.getIntroduction())
+                .specialtyTags(specialtyTags)
+                .interestTags(interestTags)
+                .weeklyGoalScore(profile.getWeeklyGoalScore())
+                .build();
     }
 
     private String resolvePublicUrl(String key) {
