@@ -83,4 +83,13 @@ public class UserController implements UserApi {
         boolean isMe = userId.equals(targetUserId);
         return ApiResponse.success(SuccessStatus.USER_CHECK_IS_ME_SUCCESS, Map.of("isMe", isMe));
     }
+
+    @Override
+    @GetMapping("/profile/top")
+    public ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileTopResponse>> getMyProfileTop(
+            @AuthenticationPrincipal Long userId
+    ) {
+        com.umc.greaming.domain.user.dto.response.MyProfileTopResponse response = userQueryService.getMyProfileTop(userId);
+        return ApiResponse.success(SuccessStatus.USER_GET_PROFILE_TOP_SUCCESS, response);
+    }
 }

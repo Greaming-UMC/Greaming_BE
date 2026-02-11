@@ -42,6 +42,7 @@ public enum SuccessStatus implements BaseStatus {
     COMMENT_CREATED("COMMENT_200", HttpStatus.OK , "댓글 생성 성공" ),
     // user
     USER_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "내 프로필 화면 조회 성공"),
+    USER_GET_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "프로필 상단 정보 조회 성공"),
     USER_REGIST_INFO_SUCCESS("USER_200", HttpStatus.OK, "최초 유저 정보 등록 성공"),
     USER_CHECK_REGISTERED_SUCCESS("USER_200", HttpStatus.OK, "프로필 등록 여부 조회 성공"),
     USER_UPDATE_INFO_SUCCESS("USER_200", HttpStatus.OK, "유저 정보 수정 성공"),

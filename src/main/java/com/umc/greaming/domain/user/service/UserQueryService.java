@@ -5,16 +5,13 @@ import com.umc.greaming.common.status.error.ErrorStatus;
 import com.umc.greaming.common.s3.service.S3Service;
 import com.umc.greaming.domain.follow.enums.FollowState;
 import com.umc.greaming.domain.follow.repository.FollowRepository;
-import com.umc.greaming.domain.user.repository.UserInterestTagRepository;
-import com.umc.greaming.domain.user.repository.UserProfileRepository;
-import com.umc.greaming.domain.user.repository.UserSpecialtyTagRepository;
+import com.umc.greaming.domain.user.repository.*;
 import com.umc.greaming.domain.user.dto.response.MyProfileTopResponse;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
 import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.entity.UserProfile;
 import com.umc.greaming.domain.user.enums.UserState;
-import com.umc.greaming.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +28,7 @@ public class UserQueryService {
     private final FollowRepository followRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
+    private final UserJournyRepository userJournyRepository;
     private final S3Service s3Service;
 
     public MyProfileTopResponse getMyProfileTop(Long userId) {
@@ -43,7 +41,9 @@ public class UserQueryService {
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
         List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
 
-        String level = "Painter";
+        String level = userJournyRepository.findByUser(user)
+                .map(userJourny -> userJourny.getJourneyLevel().name())
+                .orElse("SKETCHER");
 
         List<String> dailyChallenge = List.of();
         List<String> weeklyChallenge = List.of();
