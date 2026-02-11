@@ -49,7 +49,7 @@ public class SubmissionCommandService {
                 .thumbnailKey(request.thumbnailKey())
                 .build();
 
-        submissionRepository.save(submission);
+        submission = submissionRepository.saveAndFlush(submission);
 
         saveImages(submission, request.imageList());
 
@@ -113,8 +113,14 @@ public class SubmissionCommandService {
         if (tagNames == null || tagNames.isEmpty()) return;
 
         for (String tagName : tagNames) {
-            Tag tag = tagRepository.findByName(tagName)
-                    .orElseGet(() -> tagRepository.save(Tag.builder().name(tagName).build()));
+            String trimmedTagName = tagName.trim();
+            if (trimmedTagName.isEmpty()) continue;
+
+            Tag tag = tagRepository.findByName(trimmedTagName)
+                    .orElseGet(() -> {
+                        Tag newTag = Tag.builder().name(trimmedTagName).build();
+                        return tagRepository.save(newTag);
+                    });
 
             SubmissionTag submissionTag = SubmissionTag.builder()
                     .submission(submission)
