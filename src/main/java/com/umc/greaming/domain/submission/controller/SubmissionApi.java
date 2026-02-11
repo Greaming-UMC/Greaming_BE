@@ -254,6 +254,7 @@ public interface SubmissionApi {
                                           "caption": "상세 설명입니다.",
                                           "tags": [{"tagId": 1, "tagName": "수채화"}],
                                           "liked": false,
+                                          "isWriter": true,
                                           "uploadAt": "2026-02-10T10:00:00"
                                         },
                                         "commentPage": {
@@ -267,7 +268,10 @@ public interface SubmissionApi {
                                              "isFirst": true
                                            }
                                         },
-                                        "isWriter": true
+                                        "isWriter": true,
+                                        "field": "WEEKLY",
+                                        "challengeId": 5,
+                                        "challengeTitle": "2월 첫째주 챌린지"
                                       }
                                     }
                                     """

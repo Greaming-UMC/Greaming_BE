@@ -72,7 +72,23 @@ public class SubmissionQueryService {
 
         boolean isWriter = (loginUser != null) && submission.getUser().getUserId().equals(loginUser.getUserId());
 
-        return SubmissionDetailResponse.from(submissionInfo, commentPageResponse, isWriter);
+        String field = submission.getField().name();
+        Long challengeId = null;
+        String challengeTitle = null;
+        
+        if (submission.getChallenge() != null) {
+            challengeId = submission.getChallenge().getId();
+            challengeTitle = submission.getChallenge().getTitle();
+        }
+
+        return SubmissionDetailResponse.from(
+                submissionInfo, 
+                commentPageResponse, 
+                isWriter, 
+                field, 
+                challengeId, 
+                challengeTitle
+        );
     }
 
     public HomeSubmissionsResponse getHomeSubmissions(int page, int size, String sortBy) {
@@ -165,14 +181,6 @@ public class SubmissionQueryService {
                 .stream()
                 .map(image -> s3Service.getPublicUrl(image.getImageKey()))
                 .toList();
-
-        List<TagInfo> tagInfos = submissionTagRepository.findAllBySubmissionId(submissionId)
-                .stream()
-                .map(submissionTag -> TagInfo.from(submissionTag.getTag()))
-                .toList();
-
-        String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
-
         String level = JourneyLevel.SKETCHER.name();
         if (submission.getChallenge() != null) {
             level = weeklyUserScoreRepository.findByUserAndChallenge(submission.getUser(), submission.getChallenge())
@@ -181,9 +189,16 @@ public class SubmissionQueryService {
         }
 
         boolean isLiked = false;
+
         if (loginUser != null) {
             isLiked = submissionLikeRepository.existsByUserAndSubmission(loginUser, submission);
         }
+        List<TagInfo> tagInfos = submissionTagRepository.findAllBySubmissionId(submissionId)
+                .stream()
+                .map(submissionTag -> TagInfo.from(submissionTag.getTag()))
+                .toList();
+
+        String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
 
         return SubmissionInfo.from(submission, profileImageUrl, level, sortedImageUrls, tagInfos, isLiked);
     }
