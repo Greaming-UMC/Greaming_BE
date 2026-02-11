@@ -490,7 +490,7 @@ public interface UserApi {
                     )
             )
     })
-    @GetMapping("/profile/top")
+    @GetMapping("/me")
     ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileTopResponse>> getMyProfileTop(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
