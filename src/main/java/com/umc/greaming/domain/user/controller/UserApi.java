@@ -494,4 +494,99 @@ public interface UserApi {
     ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileTopResponse>> getMyProfileTop(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
+
+    @Operation(
+            summary = "닉네임 중복 확인",
+            description = """
+                    입력한 닉네임이 이미 사용 중인지 확인합니다.
+                    
+                    - 회원가입 또는 프로필 수정 시 사용
+                    - `isAvailable: true`이면 사용 가능, `false`이면 이미 사용 중
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "닉네임 중복 확인 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "닉네임 중복 확인 성공",
+                                      "result": {
+                                        "isAvailable": true
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/checkNickname")
+    ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> checkNickname(
+            @Parameter(description = "확인할 닉네임", example = "그림쟁이") @RequestParam String nickname
+    );
+
+    @Operation(
+            summary = "내 프로필 설정 정보 조회",
+            description = """
+                    내 프로필 설정 화면에 필요한 정보를 조회합니다.
+                    
+                    - 닉네임, 프로필 이미지, Journey 레벨, 자기소개
+                    - 전문 분야 태그, 관심 분야 태그
+                    - 주간 목표 점수
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "프로필 설정 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "프로필 설정 정보 조회 성공",
+                                      "result": {
+                                        "nickname": "그림쟁이",
+                                        "profileImgUrl": "https://s3.amazonaws.com/...",
+                                        "level": "PAINTER",
+                                        "introduction": "그림 그리는 것을 좋아합니다",
+                                        "specialtyTags": ["일러스트", "캐릭터"],
+                                        "interestTags": ["풍경", "인물"],
+                                        "weeklyGoalScore": 5
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자 또는 프로필을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/me/profile")
+    ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse>> getMyProfileSettings(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
 }

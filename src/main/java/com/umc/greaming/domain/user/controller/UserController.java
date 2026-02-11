@@ -85,4 +85,23 @@ public class UserController implements UserApi {
         com.umc.greaming.domain.user.dto.response.MyProfileTopResponse response = userQueryService.getMyProfileTop(userId);
         return ApiResponse.success(SuccessStatus.USER_GET_PROFILE_TOP_SUCCESS, response);
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNickname(
+            @RequestParam String nickname
+    ) {
+        boolean isAvailable = userQueryService.checkNicknameAvailability(nickname);
+        return ApiResponse.success(
+                SuccessStatus.USER_CHECK_NICKNAME_SUCCESS,
+                Map.of("isAvailable", isAvailable)
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse>> getMyProfileSettings(
+            @AuthenticationPrincipal Long userId
+    ) {
+        com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse response = userQueryService.getMyProfileSettings(userId);
+        return ApiResponse.success(SuccessStatus.USER_GET_PROFILE_SETTINGS_SUCCESS, response);
+    }
 }
