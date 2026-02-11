@@ -18,8 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
-@Tag(name = "User API", description = "사용자 관련 API")
-@RequestMapping("/api/user")
+@Tag(name = "User_API", description = "사용자 관련 API")
+@RequestMapping("/api/users")
 public interface UserApi {
 
     @Operation(summary = "프로필 등록 여부 확인", description = "현재 로그인한 사용자가 최초 프로필 정보를 등록했는지 여부를 확인합니다.")
@@ -426,5 +426,72 @@ public interface UserApi {
     ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> checkIsMe(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId,
             @Parameter(description = "확인할 유저 ID") @PathVariable Long targetUserId
+    );
+
+    @Operation(
+            summary = "내 프로필 상단 정보 조회",
+            description = """
+                    내 프로필 화면 상단 정보를 조회합니다.
+                    
+                    - 닉네임, 프로필 이미지, Journey 레벨, 자기소개
+                    - 팔로워/팔로잉 수
+                    - 전문 분야 태그, 관심 분야 태그
+                    - 챌린지 캘린더 정보 (일일/주간)
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "프로필 상단 정보 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "USER_200",
+                                      "message": "프로필 상단 정보 조회 성공",
+                                      "result": {
+                                        "userInformation": {
+                                          "nickname": "그림쟁이",
+                                          "profileImgUrl": "https://s3.amazonaws.com/...",
+                                          "level": "PAINTER",
+                                          "introduction": "그림 그리는 것을 좋아합니다",
+                                          "followerCount": 150,
+                                          "followingCount": 80,
+                                          "specialtyTags": ["일러스트", "캐릭터"],
+                                          "interestTags": ["풍경", "인물"]
+                                        },
+                                        "challengeCalendar": {
+                                          "dailyChallenge": [],
+                                          "weeklyChallenge": []
+                                        }
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/profile/top")
+    ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileTopResponse>> getMyProfileTop(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 }
