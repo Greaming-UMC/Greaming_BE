@@ -266,7 +266,8 @@ public interface SubmissionApi {
                                              "isLast": true,
                                              "isFirst": true
                                            }
-                                        }
+                                        },
+                                        "isWriter": true
                                       }
                                     }
                                     """

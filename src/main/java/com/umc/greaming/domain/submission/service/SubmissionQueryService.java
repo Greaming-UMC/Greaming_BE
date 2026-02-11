@@ -70,7 +70,9 @@ public class SubmissionQueryService {
         Long userId = (loginUser != null) ? loginUser.getUserId() : null;
         CommentPageResponse commentPageResponse = getCommentPageResponse(submission, page, userId);
 
-        return SubmissionDetailResponse.from(submissionInfo, commentPageResponse);
+        boolean isWriter = (loginUser != null) && submission.getUser().getUserId().equals(loginUser.getUserId());
+
+        return SubmissionDetailResponse.from(submissionInfo, commentPageResponse, isWriter);
     }
 
     public HomeSubmissionsResponse getHomeSubmissions(int page, int size, String sortBy) {

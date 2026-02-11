@@ -53,13 +53,13 @@ public record SubmissionInfo(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime uploadAt
 ) {
-    // Factory Method
+
     public static SubmissionInfo from(Submission submission,
                                       String profileImageUrl,
                                       String level,
                                       List<String> sortedImages,
                                       List<TagInfo> tags,
-                                      boolean isLiked) {
+                                      boolean isLiked  ) {
         return new SubmissionInfo(
                 submission.getId(),
                 submission.getUser().getUserId(),
