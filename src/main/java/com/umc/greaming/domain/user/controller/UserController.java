@@ -18,14 +18,12 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
 public class UserController implements UserApi {
 
     private final UserService userService;
     private final UserQueryService userQueryService;
 
     @Override
-    @GetMapping("/check-registered")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkRegistered(
             @AuthenticationPrincipal Long userId
     ) {
@@ -35,8 +33,8 @@ public class UserController implements UserApi {
                 Map.of("profileRegistered", registered)
         );
     }
+
     @Override
-    @PostMapping("/registinfo")
     public ResponseEntity<ApiResponse<Void>> registInfo(
             @AuthenticationPrincipal Long userId,
             @RequestBody RegistInfoRequest request
@@ -46,7 +44,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PatchMapping("/info")
     public ResponseEntity<ApiResponse<Void>> updateInfo(
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid UpdateUserInfoRequest request
@@ -56,7 +53,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @GetMapping("/{userId}/info")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(
             @PathVariable Long userId
     ) {
@@ -65,7 +61,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @GetMapping("/search")
     public ResponseEntity<ApiResponse<UserSearchResponse>> searchByNickname(
             @AuthenticationPrincipal Long userId,
             @RequestParam String nickname
@@ -75,7 +70,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @GetMapping("/{targetUserId}/is-me")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkIsMe(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long targetUserId
@@ -85,7 +79,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @GetMapping("/profile/top")
     public ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileTopResponse>> getMyProfileTop(
             @AuthenticationPrincipal Long userId
     ) {
