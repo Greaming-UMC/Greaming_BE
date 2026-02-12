@@ -1,6 +1,6 @@
 package com.umc.greaming.domain.user.dto.request;
 
-import com.umc.greaming.domain.user.entity.enums.UsagePurpose;
+import com.umc.greaming.domain.challenge.enums.JourneyLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -19,8 +19,8 @@ public record UpdateUserInfoRequest(
         @Schema(description = "관심 분야 태그 목록 (null이면 변경 없음, 보내면 전체 교체)", example = "[\"풍경\", \"인물\"]")
         List<String> interestTags,
 
-        @Schema(description = "사용 목적", example = "PAINTER")
-        UsagePurpose usagePurpose,
+        @Schema(description = "Journey 레벨", example = "PAINTER")
+        JourneyLevel journeyLevel,
 
         @Schema(description = "주간 목표 점수", example = "5")
         Integer weeklyGoalScore

@@ -1,6 +1,6 @@
 package com.umc.greaming.domain.user.dto.response;
 
-import com.umc.greaming.domain.user.entity.enums.UsagePurpose;
+import com.umc.greaming.domain.challenge.enums.JourneyLevel;
 
 import java.util.List;
 
@@ -10,6 +10,6 @@ public record UserInfoResponse(
         String profileImgUrl,
         List<String> specialtyTags,
         List<String> interestTags,
-        UsagePurpose usagePurpose,
+        JourneyLevel journeyLevel,
         Integer weeklyGoalScore
 ) {}

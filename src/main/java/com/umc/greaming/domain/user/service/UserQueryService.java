@@ -11,7 +11,7 @@ import com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
 import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.entity.User;
-import com.umc.greaming.domain.user.entity.UserProfile;
+import com.umc.greaming.domain.user.entity.UserJourny;
 import com.umc.greaming.domain.user.enums.UserState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,6 @@ import java.util.List;
 public class UserQueryService {
 
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
     private final FollowRepository followRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
@@ -86,7 +85,7 @@ public class UserQueryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        UserProfile profile = userProfileRepository.findByUser(user)
+        UserJourny journey = userJournyRepository.findByUser(user)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
 
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
@@ -98,8 +97,8 @@ public class UserQueryService {
                 resolvePublicUrl(user.getProfileImageKey()),
                 specialtyTags,
                 interestTags,
-                profile.getUsagePurpose(),
-                profile.getWeeklyGoalScore()
+                journey.getJourneyLevel(),
+                journey.getWeeklyGoalScore()
         );
     }
 
@@ -116,7 +115,7 @@ public class UserQueryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        UserProfile profile = userProfileRepository.findByUser(user)
+        UserJourny journey = userJournyRepository.findByUser(user)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
 
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
@@ -127,11 +126,11 @@ public class UserQueryService {
         return MyProfileSettingsResponse.builder()
                 .nickname(user.getNickname())
                 .profileImgUrl(profileImgUrl)
-                .usagePurpose(profile.getUsagePurpose())
+                .journeyLevel(journey.getJourneyLevel())
                 .introduction(user.getIntroduction())
                 .specialtyTags(specialtyTags)
                 .interestTags(interestTags)
-                .weeklyGoalScore(profile.getWeeklyGoalScore())
+                .weeklyGoalScore(journey.getWeeklyGoalScore())
                 .build();
     }
 
