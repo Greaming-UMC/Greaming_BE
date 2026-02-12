@@ -122,16 +122,12 @@ public class UserQueryService {
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
         List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
 
-        String level = userJournyRepository.findByUser(user)
-                .map(userJourny -> userJourny.getJourneyLevel().name())
-                .orElse("SKETCHER");
-
         String profileImgUrl = resolvePublicUrl(user.getProfileImageKey());
 
         return MyProfileSettingsResponse.builder()
                 .nickname(user.getNickname())
                 .profileImgUrl(profileImgUrl)
-                .level(level)
+                .usagePurpose(profile.getUsagePurpose())
                 .introduction(user.getIntroduction())
                 .specialtyTags(specialtyTags)
                 .interestTags(interestTags)

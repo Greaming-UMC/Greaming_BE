@@ -536,7 +536,7 @@ public interface UserApi {
             description = """
                     내 프로필 설정 화면에 필요한 정보를 조회합니다.
                     
-                    - 닉네임, 프로필 이미지, Journey 레벨, 자기소개
+                    - 닉네임, 프로필 이미지, 사용 목적, 자기소개
                     - 전문 분야 태그, 관심 분야 태그
                     - 주간 목표 점수
                     """
@@ -557,7 +557,7 @@ public interface UserApi {
                                       "result": {
                                         "nickname": "그림쟁이",
                                         "profileImgUrl": "https://s3.amazonaws.com/...",
-                                        "level": "PAINTER",
+                                        "usagePurpose": "PAINTER",
                                         "introduction": "그림 그리는 것을 좋아합니다",
                                         "specialtyTags": ["일러스트", "캐릭터"],
                                         "interestTags": ["풍경", "인물"],

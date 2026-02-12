@@ -1,5 +1,6 @@
 package com.umc.greaming.domain.user.dto.response;
 
+import com.umc.greaming.domain.user.entity.enums.UsagePurpose;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class MyProfileSettingsResponse {
 
     private String nickname;
     private String profileImgUrl;
-    private String level;
+    private UsagePurpose usagePurpose;
     private String introduction;
     private List<String> specialtyTags;
     private List<String> interestTags;
