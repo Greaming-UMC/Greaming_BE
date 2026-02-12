@@ -18,7 +18,6 @@ import java.util.UUID;
 public class S3Service {
 
     private final S3Presigner s3Presigner;
-    public static final String DEFAULT_PROFILE_IMAGE = "common/default_profile.png";
     private final String defaultKey = createPath("common", "default_profile.jpg");
 
     @Value("${spring.cloud.aws.s3.bucket}")
