@@ -36,6 +36,7 @@ public enum SuccessStatus implements BaseStatus {
     SUBMISSION_UPDATE("SUBMISSION_200", HttpStatus.OK , "게시물 수정 성공" ),
     SUBMISSION_DELETED("SUBMISSION_200", HttpStatus.OK , "게시물 삭제 성공" ),
     SUBMISSION_CREATED("SUBMISSION_200", HttpStatus.OK , "게시물 추가 성공" ),
+    USER_SUBMISSION_LIST_SUCCESS("SUBMISSION_200", HttpStatus.OK, "유저 게시글 목록 조회 성공"),
 
     //댓글
     COMMENT_LIST_SUCCESS("COMMENT_200", HttpStatus.OK , "다음 댓글 불러오기 성공" ),

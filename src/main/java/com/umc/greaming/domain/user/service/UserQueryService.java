@@ -33,7 +33,7 @@ public class UserQueryService {
     private final S3Service s3Service;
 
     public MyProfileTopResponse getMyProfileTop(Long userId) {
-        // userId null 체크
+
         if (userId == null) {
             throw new GeneralException(ErrorStatus.UNAUTHORIZED);
         }
@@ -41,29 +41,24 @@ public class UserQueryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        // 팔로워/팔로잉 수 조회
         long followerCount = followRepository.countByFollowing_UserIdAndState(userId, FollowState.COMPLETED);
         long followingCount = followRepository.countByFollower_UserIdAndState(userId, FollowState.COMPLETED);
 
-        // 태그 조회
         List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
         List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
 
-        // 레벨 조회
         String level = userJournyRepository.findByUser(user)
                 .map(userJourny -> userJourny.getJourneyLevel().name())
                 .orElse("SKETCHER");
 
-        // 챌린지 캘린더 (임시 빈 리스트)
         List<String> dailyChallenge = List.of();
         List<String> weeklyChallenge = List.of();
 
-        // 프로필 이미지 URL
         String profileImgUrl = resolvePublicUrl(user.getProfileImageKey());
 
-        // 응답 생성
         MyProfileTopResponse response = MyProfileTopResponse.builder()
                 .userInformation(MyProfileTopResponse.UserInformation.builder()
+                        .userId(userId)
                         .nickname(user.getNickname())
                         .profileImgUrl(profileImgUrl)
                         .level(level)

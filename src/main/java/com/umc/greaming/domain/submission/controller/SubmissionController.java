@@ -12,6 +12,7 @@ import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionLikeResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
+import com.umc.greaming.domain.submission.dto.response.UserSubmissionsResponse;
 import com.umc.greaming.domain.submission.service.SubmissionCommandService;
 import com.umc.greaming.domain.submission.service.SubmissionQueryService;
 import com.umc.greaming.domain.user.entity.User;
@@ -118,6 +119,22 @@ public class SubmissionController implements SubmissionApi {
         User user = findUserOrThrow(userId);
         SubmissionLikeResponse result = submissionCommandService.toggleLike(submissionId, user);
         return ApiResponse.success(SuccessStatus.LIKE_TOGGLE_SUCCESS, result);
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<UserSubmissionsResponse>> getUserSubmissions(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long loginUserId
+    ) {
+        User loginUser = null;
+        if (loginUserId != null) {
+            loginUser = userRepository.findById(loginUserId).orElse(null);
+        }
+
+        UserSubmissionsResponse result = submissionQueryService.getUserSubmissions(userId, page, size, loginUser);
+        return ApiResponse.success(SuccessStatus.USER_SUBMISSION_LIST_SUCCESS, result);
     }
 
     private User findUserOrThrow(Long userId) {

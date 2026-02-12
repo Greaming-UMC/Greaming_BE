@@ -9,6 +9,7 @@ import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionLikeResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
+import com.umc.greaming.domain.submission.dto.response.UserSubmissionsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -567,5 +568,67 @@ public interface SubmissionApi {
     ResponseEntity<ApiResponse<SubmissionLikeResponse>> toggleLike(
             @Parameter(description = "좋아요할 게시글 ID") @Positive @PathVariable("submissionId") Long submissionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
+
+    @Operation(summary = "특정 유저의 게시글 목록 조회", description = """
+            특정 유저가 작성한 게시글 목록을 페이지네이션으로 조회합니다.
+            
+            - 최신순으로 정렬됩니다.
+            - 썸네일, 좋아요/댓글/북마크 수 등 간단한 정보만 반환합니다.
+            
+            **페이지 사이즈:**
+            - 기본값: 20
+            - 최소: 1
+            - 최대: 50
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "유저 게시글 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "SUBMISSION_200",
+                                      "message": "유저 게시글 목록 조회 성공",
+                                      "result": {
+                                        "submissions": [
+                                          {
+                                            "submissionId": 7,
+                                            "thumbnailUrl": "https://greaming-bucket.s3.ap-northeast-2.amazonaws.com/submissions/user1/thumb_uuid.jpg",
+                                            "userId": 1,
+                                            "nickname": "Picasso",
+                                            "profileImageUrl": null,
+                                            "likesCount": 0,
+                                            "commentCount": 0,
+                                            "bookmarkCount": 0
+                                          }
+                                        ],
+                                        "pageInfo": {
+                                          "currentPage": 1,
+                                          "pageSize": 20,
+                                          "totalPages": 5,
+                                          "totalElements": 100,
+                                          "isLast": false,
+                                          "isFirst": true
+                                        }
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/user/{userId}")
+    ResponseEntity<ApiResponse<UserSubmissionsResponse>> getUserSubmissions(
+            @Parameter(description = "조회할 유저 ID") @Positive @PathVariable("userId") Long userId,
+            @Parameter(description = "페이지 번호 (1부터 시작)", example = "1")
+            @RequestParam(defaultValue = "1") @Positive int page,
+            @Parameter(description = "페이지 사이즈 (1-50)", example = "20")
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50) int size,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long loginUserId
     );
 }
