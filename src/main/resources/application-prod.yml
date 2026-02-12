@@ -15,8 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      # 서비스가 안정화되면 나중에 validate로 변경
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
 
   security:
