@@ -42,4 +42,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
            "JOIN FETCH s.user " +
            "WHERE s.deletedAt IS NULL")
     Page<Submission> findAllByIsDeletedFalse(Pageable pageable);
+
+    @Query("SELECT s FROM Submission s " +
+           "JOIN FETCH s.user " +
+           "WHERE s.user.userId = :userId " +
+           "AND s.deletedAt IS NULL")
+    Page<Submission> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }

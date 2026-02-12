@@ -46,18 +46,20 @@ public class UserService {
             throw new GeneralException(ErrorStatus.USER_ALREADY_REGISTERED);
         }
 
-        UserJourny userJourny = UserJourny.builder()
-                .user(user)
-                .journeyLevel(request.journeyLevel())
-                .weeklyGoalScore(request.weeklyGoalScore())
-                .build();
-
-        userJournyRepository.save(userJourny);
+        UserJourny userJourny = userJournyRepository.findByUser(user)
+                .orElseGet(() -> userJournyRepository.save(
+                        UserJourny.builder().user(user).build()
+                ));
+        userJourny.updateInfo(request.journeyLevel(), request.weeklyGoalScore());
 
         saveSpecialtyTags(user, request.specialtyTags());
         saveInterestTags(user, request.interestTags());
 
         user.registerProfile(request.nickname(), request.intro());
+
+        if (request.profileImageKey() != null) {
+            user.updateProfile(user.getNickname(), user.getIntroduction(), request.profileImageKey());
+        }
     }
 
     @Transactional
@@ -68,6 +70,10 @@ public class UserService {
 
         user.updateInfo(request.nickname(), request.intro());
         journey.updateInfo(request.journeyLevel(), request.weeklyGoalScore());
+
+        if (request.profileImageKey() != null) {
+            user.updateProfile(user.getNickname(), user.getIntroduction(), request.profileImageKey());
+        }
 
         if (request.specialtyTags() != null) {
             userSpecialtyTagRepository.deleteAllByUser(user);

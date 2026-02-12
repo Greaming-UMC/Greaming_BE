@@ -17,6 +17,9 @@ public record SubmissionUpdateRequest(
         @Schema(description = "수정할 댓글 허용 여부 (null일 경우 변경 없음)", example = "false")
         Boolean commentEnabled,
 
+        @Schema(description = "수정할 썸네일 이미지 S3 Key (null일 경우 변경 없음)", example = "submissions/user1/new_thumb.jpg")
+        String thumbnailKey,
+
         @Schema(description = "수정할 태그 목록 (보낼 경우 기존 태그 싹 지우고 이걸로 교체됨)", example = "[\"수정태그1\", \"태그2\"]")
         List<String> tags,
 

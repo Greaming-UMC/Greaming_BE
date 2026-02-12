@@ -15,7 +15,7 @@ public record SubmissionCreateRequest(
         @Schema(description = "게시글 내용", example = "열심히 그렸습니다.")
         String caption,
 
-        @Schema(description = "공개 범위 (PUBLIC / PRIVATE)", example = "PUBLIC")
+        @Schema(description = "공개 범위 (PUBLIC / CIRCLE)", example = "PUBLIC")
         @NotNull(message = "공개 범위는 필수입니다.")
         SubmissionVisibility visibility,
 

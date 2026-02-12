@@ -31,6 +31,7 @@ public class CommentCommandService {
     public CommentInfo createComment(CommentCreateRequest request, User user) {
         Submission submission = submissionRepository.findById(request.submissionId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
+        
         Comment newComment = Comment.builder()
                 .submission(submission)
                 .user(user)
@@ -38,6 +39,8 @@ public class CommentCommandService {
                 .build();
 
         Comment savedComment = commentRepository.save(newComment);
+
+        submission.increaseCommentCount();
 
         String profileUrl = s3Service.getPublicUrl(user.getProfileImageKey());
 
@@ -60,5 +63,18 @@ public class CommentCommandService {
         String profileUrl = s3Service.getPublicUrl(user.getProfileImageKey());
 
         return ReplyInfo.from(savedReply, profileUrl, true);
+    }
+
+    public void deleteComment(Long commentId, User user) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+
+        if (!comment.getUser().getUserId().equals(user.getUserId())) {
+            throw new GeneralException(ErrorStatus.COMMENT_NOT_AUTHORIZED);
+        }
+
+        comment.delete();
+
+        comment.getSubmission().decreaseCommentCount();
     }
 }

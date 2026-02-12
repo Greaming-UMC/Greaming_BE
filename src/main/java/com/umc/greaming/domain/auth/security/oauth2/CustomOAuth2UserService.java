@@ -3,8 +3,10 @@ package com.umc.greaming.domain.auth.security.oauth2;
 import com.umc.greaming.domain.auth.entity.Provider;
 import com.umc.greaming.domain.auth.repository.ProviderRepository;
 import com.umc.greaming.domain.user.entity.User;
+import com.umc.greaming.domain.user.entity.UserJourny;
 import com.umc.greaming.domain.user.enums.UserState;
 import com.umc.greaming.domain.user.enums.Visibility;
+import com.umc.greaming.domain.user.repository.UserJournyRepository;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final ProviderRepository providerRepository;
+    private final UserJournyRepository userJournyRepository;
 
     @Override
     @Transactional
@@ -90,7 +93,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .visibility(Visibility.PUBLIC)
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        UserJourny userJourny = UserJourny.builder()
+                .user(user)
+                .build();
+        userJournyRepository.save(userJourny);
+
+        return user;
     }
 
     private void createProvider(String registrationId, OAuth2UserInfo userInfo, User user) {
