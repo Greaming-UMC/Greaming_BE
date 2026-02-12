@@ -40,6 +40,10 @@ public enum SuccessStatus implements BaseStatus {
     //댓글
     COMMENT_LIST_SUCCESS("COMMENT_200", HttpStatus.OK , "다음 댓글 불러오기 성공" ),
     COMMENT_CREATED("COMMENT_200", HttpStatus.OK , "댓글 생성 성공" ),
+    
+    //좋아요
+    LIKE_TOGGLE_SUCCESS("LIKE_200", HttpStatus.OK, "좋아요 상태가 변경되었습니다."),
+    
     // user
     USER_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "내 프로필 화면 조회 성공"),
     USER_GET_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "프로필 상단 정보 조회 성공"),

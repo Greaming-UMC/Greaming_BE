@@ -10,6 +10,7 @@ import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
+import com.umc.greaming.domain.submission.dto.response.SubmissionLikeResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
 import com.umc.greaming.domain.submission.service.SubmissionCommandService;
 import com.umc.greaming.domain.submission.service.SubmissionQueryService;
@@ -107,6 +108,16 @@ public class SubmissionController implements SubmissionApi {
         CommentPageResponse result = submissionQueryService.getCommentList(submissionId, page, userId);
 
         return ApiResponse.success(SuccessStatus.COMMENT_LIST_SUCCESS, result);
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<SubmissionLikeResponse>> toggleLike(
+            @PathVariable Long submissionId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    ) {
+        User user = findUserOrThrow(userId);
+        SubmissionLikeResponse result = submissionCommandService.toggleLike(submissionId, user);
+        return ApiResponse.success(SuccessStatus.LIKE_TOGGLE_SUCCESS, result);
     }
 
     private User findUserOrThrow(Long userId) {
