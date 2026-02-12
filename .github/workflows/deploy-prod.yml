@@ -58,7 +58,7 @@ jobs:
             echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env.prod
             echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env.prod
             echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env.prod
-            echo "OAUTH2_REDIRECT_URI=http://www.greaming.com/auth/callback >> .env.prod
+            echo "OAUTH2_REDIRECT_URI=https://www.greaming.com/auth/callback >> .env.prod
             echo "SWAGGER_URL=https://api.greaming.com" >> .env.prod
 
             chmod +x ./deploy-prod.sh
