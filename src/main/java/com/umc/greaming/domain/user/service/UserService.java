@@ -8,10 +8,10 @@ import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
 import com.umc.greaming.domain.user.dto.request.UpdateUserInfoRequest;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.entity.UserInterestTag;
-import com.umc.greaming.domain.user.entity.UserProfile;
+import com.umc.greaming.domain.user.entity.UserJourny;
 import com.umc.greaming.domain.user.entity.UserSpecialtyTag;
 import com.umc.greaming.domain.user.repository.UserInterestTagRepository;
-import com.umc.greaming.domain.user.repository.UserProfileRepository;
+import com.umc.greaming.domain.user.repository.UserJournyRepository;
 import com.umc.greaming.domain.user.repository.UserRepository;
 import com.umc.greaming.domain.user.repository.UserSpecialtyTagRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserJournyRepository userJournyRepository;
     private final TagRepository tagRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
@@ -44,13 +44,13 @@ public class UserService {
             throw new GeneralException(ErrorStatus.USER_ALREADY_REGISTERED);
         }
 
-        UserProfile userProfile = UserProfile.builder()
+        UserJourny userJourny = UserJourny.builder()
                 .user(user)
-                .usagePurpose(request.usagePurpose())
+                .journeyLevel(request.journeyLevel())
                 .weeklyGoalScore(request.weeklyGoalScore())
                 .build();
 
-        userProfileRepository.save(userProfile);
+        userJournyRepository.save(userJourny);
 
         saveSpecialtyTags(user, request.specialtyTags());
         saveInterestTags(user, request.interestTags());
@@ -61,11 +61,11 @@ public class UserService {
     @Transactional
     public void updateInfo(Long userId, UpdateUserInfoRequest request) {
         User user = findUser(userId);
-        UserProfile profile = userProfileRepository.findByUser(user)
+        UserJourny journey = userJournyRepository.findByUser(user)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
 
         user.updateInfo(request.nickname(), request.intro());
-        profile.updateInfo(request.usagePurpose(), request.weeklyGoalScore());
+        journey.updateInfo(request.journeyLevel(), request.weeklyGoalScore());
 
         if (request.specialtyTags() != null) {
             userSpecialtyTagRepository.deleteAllByUser(user);

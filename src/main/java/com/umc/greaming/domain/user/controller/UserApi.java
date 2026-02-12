@@ -91,7 +91,7 @@ public interface UserApi {
             description = """
                     소셜 로그인 후 최초 1회 사용자 정보를 등록합니다.
 
-                    - 닉네임, 자기소개, 전문 분야 태그, 관심 분야 태그, 사용 목적, 주간 목표 점수를 설정합니다.
+                    - 닉네임, 자기소개, 전문 분야 태그, 관심 분야 태그, Journey 레벨, 주간 목표 점수를 설정합니다.
                     - 이미 정보가 등록된 유저는 409 에러가 반환됩니다.
                     """
     )
@@ -253,7 +253,7 @@ public interface UserApi {
                     유저의 프로필 정보를 조회합니다.
 
                     - 인증 없이 누구나 조회할 수 있습니다.
-                    - 닉네임, 자기소개, 프로필 이미지, 태그, 사용 목적, 주간 목표 점수를 반환합니다.
+                    - 닉네임, 자기소개, 프로필 이미지, 태그, Journey 레벨, 주간 목표 점수를 반환합니다.
                     - 프로필 미등록 유저는 404 에러가 반환됩니다.
                     """
     )
@@ -276,7 +276,7 @@ public interface UserApi {
                                         "profileImgUrl": "https://s3.amazonaws.com/...",
                                         "specialtyTags": ["일러스트", "캐릭터"],
                                         "interestTags": ["풍경", "인물"],
-                                        "usagePurpose": "PAINTER",
+                                        "journeyLevel": "PAINTER",
                                         "weeklyGoalScore": 5
                                       }
                                     }
@@ -536,7 +536,7 @@ public interface UserApi {
             description = """
                     내 프로필 설정 화면에 필요한 정보를 조회합니다.
                     
-                    - 닉네임, 프로필 이미지, 사용 목적, 자기소개
+                    - 닉네임, 프로필 이미지, Journey 레벨, 자기소개
                     - 전문 분야 태그, 관심 분야 태그
                     - 주간 목표 점수
                     """
@@ -557,7 +557,7 @@ public interface UserApi {
                                       "result": {
                                         "nickname": "그림쟁이",
                                         "profileImgUrl": "https://s3.amazonaws.com/...",
-                                        "usagePurpose": "PAINTER",
+                                        "journeyLevel": "PAINTER",
                                         "introduction": "그림 그리는 것을 좋아합니다",
                                         "specialtyTags": ["일러스트", "캐릭터"],
                                         "interestTags": ["풍경", "인물"],

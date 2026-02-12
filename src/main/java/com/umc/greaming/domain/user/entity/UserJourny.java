@@ -39,10 +39,22 @@ public class UserJourny extends BaseEntity {
     @Builder.Default
     private Integer bronzeMedal = 0;
     
+    @Column(name = "weekly_goal_score", nullable = false)
+    @Builder.Default
+    private Integer weeklyGoalScore = 0;
+
     @Column(name = "goal_score", nullable = false)
     @Builder.Default
     private Integer goalScore = 0;
-    
+
+    /**
+     * Journey 레벨 및 주간 목표 점수 수정
+     */
+    public void updateInfo(JourneyLevel journeyLevel, Integer weeklyGoalScore) {
+        if (journeyLevel != null) this.journeyLevel = journeyLevel;
+        if (weeklyGoalScore != null) this.weeklyGoalScore = weeklyGoalScore;
+    }
+
     /**
      * 메달 추가
      */
