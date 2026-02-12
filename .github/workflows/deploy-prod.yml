@@ -1,0 +1,65 @@
+name: Deploy PROD (Main)
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Docker Build & Push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_REPO }}:prod-latest -t ${{ secrets.DOCKER_REPO }}:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_REPO }}:prod-latest
+          docker push ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
+
+      - name: Deploy to Prod Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo docker stop greaming-prod || true
+            sudo docker rm greaming-prod || true
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:prod-latest
+            
+            rm -f .env.prod
+            
+            echo "SERVER_PORT=8080" >> .env.prod
+            echo "TZ=Asia/Seoul" >> .env.prod
+            echo "SPRING_PROFILES_ACTIVE=prod" >> .env.prod
+            echo "SPRING_DATASOURCE_URL=${{ secrets.PROD_DB_URL }}" >> .env.prod
+            echo "SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}" >> .env.prod
+            echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env.prod
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env.prod
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env.prod
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.prod
+            echo "OAUTH2_GOOGLE_CLIENT_ID=${{ secrets.OAUTH2_GOOGLE_CLIENT_ID }}" >> .env.prod
+            echo "OAUTH2_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH2_GOOGLE_CLIENT_SECRET }}" >> .env.prod
+            echo "OAUTH2_KAKAO_CLIENT_ID=${{ secrets.OAUTH2_KAKAO_CLIENT_ID }}" >> .env.prod
+            echo "OAUTH2_KAKAO_CLIENT_SECRET=${{ secrets.OAUTH2_KAKAO_CLIENT_SECRET }}" >> .env.prod
+            echo "OAUTH2_REDIRECT_URI=https://api.greaming.com/login/oauth2/code/kakao" >> .env.prod
+            echo "SWAGGER_URL=https://api.greaming.com" >> .env.prod
+
+            chmod +x ./deploy-prod.sh
+            ./deploy-prod.sh
