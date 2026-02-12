@@ -58,7 +58,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
             user = userRepository.findById(provider.getUserId())
                     .orElseThrow(() -> new OAuth2AuthenticationException("사용자를 찾을 수 없습니다."));
-            log.info("기존 사용자 로그인: userId={}, provider={}", user.getUserId(), registrationId);
+
+            if (user.isDeleted()) {
+                // 탈퇴한 유저 → 기존 Provider 해제 후 새 계정 생성
+                providerRepository.delete(provider);
+                providerRepository.flush();
+                isNewUser = true;
+                user = createUser(userInfo);
+                createProvider(registrationId, userInfo, user);
+                log.info("탈퇴 유저 재가입: userId={}, provider={}", user.getUserId(), registrationId);
+            } else {
+                log.info("기존 사용자 로그인: userId={}, provider={}", user.getUserId(), registrationId);
+            }
         }
 
         return new CustomOAuth2User(

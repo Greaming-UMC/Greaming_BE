@@ -2,6 +2,7 @@ package com.umc.greaming.domain.user.service;
 
 import com.umc.greaming.common.exception.GeneralException;
 import com.umc.greaming.common.status.error.ErrorStatus;
+import com.umc.greaming.domain.auth.repository.RefreshTokenRepository;
 import com.umc.greaming.domain.tag.entity.Tag;
 import com.umc.greaming.domain.tag.repository.TagRepository;
 import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
@@ -26,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserJournyRepository userJournyRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final TagRepository tagRepository;
     private final UserSpecialtyTagRepository userSpecialtyTagRepository;
     private final UserInterestTagRepository userInterestTagRepository;
@@ -77,6 +79,13 @@ public class UserService {
             userInterestTagRepository.flush();
             saveInterestTags(user, request.interestTags());
         }
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = findUser(userId);
+        user.delete();
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
     private User findUser(Long userId) {

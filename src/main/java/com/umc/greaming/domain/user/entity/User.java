@@ -75,6 +75,10 @@ public class User extends BaseEntity {
         this.userState = UserState.DELETED;
     }
 
+    public boolean isDeleted() {
+        return this.userState == UserState.DELETED;
+    }
+
     public void registerProfile(String nickname, String introduction) {
         this.nickname = nickname;
         this.introduction = introduction;

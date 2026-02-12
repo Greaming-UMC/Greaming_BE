@@ -60,12 +60,13 @@ public record SubmissionInfo(
                                       List<String> sortedImages,
                                       List<TagInfo> tags,
                                       boolean isLiked) {
+        boolean deleted = submission.getUser().isDeleted();
         return new SubmissionInfo(
                 submission.getId(),
                 submission.getUser().getUserId(),
-                submission.getUser().getNickname(),
-                profileImageUrl,
-                level,
+                deleted ? "삭제된 사용자" : submission.getUser().getNickname(),
+                deleted ? null : profileImageUrl,
+                deleted ? null : level,
                 sortedImages,
                 submission.getLikeCount(),
                 submission.getCommentCount(),
