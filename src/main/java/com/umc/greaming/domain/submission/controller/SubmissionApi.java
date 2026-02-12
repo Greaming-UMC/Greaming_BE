@@ -192,7 +192,6 @@ public interface SubmissionApi {
                                       "result": {
                                         "submissionId": 100,
                                         "thumbnailUrl": "https://s3.ap-northeast-2.amazonaws.com/bucket/submission/thumb_100.jpg",
-                                        "title": "미리보기 제목",
                                         "tags": ["일러스트", "풍경"]
                                       }
                                     }
@@ -254,7 +253,6 @@ public interface SubmissionApi {
                                           "caption": "상세 설명입니다.",
                                           "tags": [{"tagId": 1, "tagName": "수채화"}],
                                           "liked": false,
-                                          "isWriter": true,
                                           "uploadAt": "2026-02-10T10:00:00"
                                         },
                                         "commentPage": {

@@ -66,9 +66,7 @@ public class SubmissionCommandService {
             throw new GeneralException(ErrorStatus.SUBMISSION_NOT_AUTHORIZED);
         }
 
-        submission.updateInfo(request.title(), request.caption());
-        submission.updateVisibility(request.visibility());
-        submission.changeCommentEnabled(request.commentEnabled());
+        submission.update(request.title(), request.caption(), request.visibility(), request.commentEnabled(), request.thumbnailKey());
 
         if (request.imageList() != null) {
             submissionImageRepository.deleteAllBySubmission(submission);

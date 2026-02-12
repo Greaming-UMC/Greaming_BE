@@ -40,13 +40,13 @@ public interface CommentApi {
                                       "code": "COMMENT_200",
                                       "message": "댓글 생성 성공",
                                       "result": {
-                                        "commentId": 10,
+                                        "comment_id": 10,
+                                        "user_id": 1,
                                         "writer_nickname": "그림쟁이",
                                         "writer_profileImgUrl": "https://s3.ap-northeast-2.amazonaws.com/greaming/profile/test.jpg",
                                         "content": "작품이 너무 멋져요!",
-                                        "createdAt": "2024.02.09 18:30",
-                                        "isWriter": true,
-                                        "isLiked": false
+                                        "isLiked": false,
+                                        "isWriter": true
                                       }
                                     }
                                     """
@@ -114,13 +114,15 @@ public interface CommentApi {
                                         "replies": [
                                           {
                                             "replyId": 25,
+                                            "userId": 2,
                                             "writer_nickname": "답글러",
                                             "writer_profileImgUrl": "https://s3.ap-northeast-2.amazonaws.com/greaming/profile/reply_user.jpg",
                                             "content": "저도 동감합니다.",
                                             "createdAt": "2024.02.09 19:00",
                                             "isWriter": false
                                           }
-                                        ]
+                                        ],
+                                        "totalCount": 1
                                       }
                                     }
                                     """
