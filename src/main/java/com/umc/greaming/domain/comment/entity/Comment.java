@@ -5,6 +5,9 @@ import com.umc.greaming.domain.submission.entity.Submission;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
@@ -12,6 +15,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
 public class Comment extends BaseEntity {
 
     @Id
@@ -30,4 +34,10 @@ public class Comment extends BaseEntity {
     @Column(name ="content",nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

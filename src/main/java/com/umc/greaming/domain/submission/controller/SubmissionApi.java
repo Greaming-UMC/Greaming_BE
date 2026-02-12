@@ -7,6 +7,7 @@ import com.umc.greaming.domain.submission.dto.request.SubmissionCreateRequest;
 import com.umc.greaming.domain.submission.dto.request.SubmissionUpdateRequest;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
+import com.umc.greaming.domain.submission.dto.response.SubmissionLikeResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/submissions")
 public interface SubmissionApi {
 
-    // 0. 모든 게시글 목록 조회 (홈 화면용)
     @Operation(summary = "모든 게시글 목록 조회", description = """
             홈 화면에서 모든 게시글을 페이지네이션으로 조회합니다.
             
@@ -107,7 +107,6 @@ public interface SubmissionApi {
             @RequestParam(defaultValue = "latest") String sortBy
     );
 
-    // 1. 게시글 생성
     @Operation(summary = "게시글 생성", description = """
             새로운 게시글을 등록합니다.
             
@@ -174,7 +173,6 @@ public interface SubmissionApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 2. 게시글 미리보기
     @Operation(summary = "게시글 미리보기 조회", description = "게시글 ID를 통해 썸네일과 태그 등 요약 정보를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -224,7 +222,6 @@ public interface SubmissionApi {
             @Parameter(description = "게시글 ID") @Positive @PathVariable("submissionId") Long submissionId
     );
 
-    // 3. 게시글 상세 조회
     @Operation(summary = "게시글 상세 조회", description = "게시글의 상세 정보와 댓글 목록(1페이지)을 함께 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -304,7 +301,6 @@ public interface SubmissionApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 4. 댓글 목록 조회
     @Operation(summary = "댓글 목록 조회 (페이징)", description = "게시글의 댓글만 따로 조회합니다. (더보기 기능 등)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -371,7 +367,6 @@ public interface SubmissionApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 5. 게시글 수정
     @Operation(summary = "게시글 수정", description = """
             게시글 정보를 수정합니다.
             
@@ -457,7 +452,6 @@ public interface SubmissionApi {
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 
-    // 6. 게시글 삭제
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다. (본인만 가능)")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -518,6 +512,60 @@ public interface SubmissionApi {
     @DeleteMapping("/{submissionId}")
     ResponseEntity<ApiResponse<Long>> deleteSubmission(
             @Parameter(description = "삭제할 게시글 ID") @Positive @PathVariable("submissionId") Long submissionId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
+
+    @Operation(summary = "게시글 좋아요 토글", description = """
+            게시글에 좋아요를 추가하거나 취소합니다.
+            
+            - 이미 좋아요를 눌렀다면 → 좋아요 취소
+            - 좋아요를 누르지 않았다면 → 좋아요 추가
+            - 본인 게시글에도 좋아요 가능
+            """)
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "좋아요 토글 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "LIKE_200",
+                                      "message": "좋아요 상태가 변경되었습니다.",
+                                      "result": {
+                                        "isLiked": true,
+                                        "likeCount": 42
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 게시글",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "SUBMISSION_404",
+                                      "message": "작품을 찾을 수 없습니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/{submissionId}/like")
+    ResponseEntity<ApiResponse<SubmissionLikeResponse>> toggleLike(
+            @Parameter(description = "좋아요할 게시글 ID") @Positive @PathVariable("submissionId") Long submissionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 }

@@ -12,6 +12,8 @@ import java.util.List;
 public interface SubmissionLikeRepository extends JpaRepository<SubmissionLike, Long> {
 
     boolean existsByUserAndSubmission(User user, Submission submission);
+    
+    void deleteByUserAndSubmission(User user, Submission submission);
 
     @Query("SELECT sl.submission.id FROM SubmissionLike sl WHERE sl.user.userId = :userId AND sl.submission.id IN :submissionIds")
     List<Long> findLikedSubmissionIdsByUserIdAndSubmissionIds(@Param("userId") Long userId, @Param("submissionIds") List<Long> submissionIds);
