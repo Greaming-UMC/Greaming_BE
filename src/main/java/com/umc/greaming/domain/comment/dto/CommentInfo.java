@@ -25,11 +25,12 @@ public record CommentInfo(
         Boolean isWriter
 ) {
     public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked, boolean isWriter) {
+        boolean deleted = comment.getUser().isDeleted();
         return new CommentInfo(
                 comment.getId(),
                 comment.getUser().getUserId(),
-                comment.getUser().getNickname(),
-                profileUrl,
+                deleted ? "삭제된 사용자" : comment.getUser().getNickname(),
+                deleted ? null : profileUrl,
                 comment.getContent(),
                 isLiked,
                 isWriter

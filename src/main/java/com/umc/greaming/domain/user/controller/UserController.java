@@ -104,4 +104,12 @@ public class UserController implements UserApi {
         com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse response = userQueryService.getMyProfileSettings(userId);
         return ApiResponse.success(SuccessStatus.USER_GET_PROFILE_SETTINGS_SUCCESS, response);
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @AuthenticationPrincipal Long userId
+    ) {
+        userService.deleteUser(userId);
+        return ApiResponse.success(SuccessStatus.DELETE_USER_SUCCESS);
+    }
 }

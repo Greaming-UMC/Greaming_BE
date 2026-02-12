@@ -589,4 +589,75 @@ public interface UserApi {
     ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse>> getMyProfileSettings(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
+
+    @Operation(
+            summary = "회원 탈퇴",
+            description = """
+                    현재 로그인한 사용자의 계정을 탈퇴 처리합니다.
+
+                    - 소프트 삭제: 유저 상태를 DELETED로 변경합니다.
+                    - 리프레시 토큰을 삭제하여 로그아웃 처리합니다.
+                    - 기존 콘텐츠(게시물, 댓글 등)는 유지되며, 작성자는 '삭제된 사용자'로 표시됩니다.
+                    """
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "회원 탈퇴 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "AUTH_200",
+                                      "message": "회원탈퇴 성공",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMM_401",
+                                      "message": "인증이 필요합니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "AUTH_404",
+                                      "message": "회원을 찾을 수 없습니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @DeleteMapping("/me")
+    ResponseEntity<ApiResponse<Void>> deleteUser(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
 }

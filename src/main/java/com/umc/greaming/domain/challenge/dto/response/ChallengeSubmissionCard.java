@@ -39,12 +39,13 @@ public record ChallengeSubmissionCard(
         Integer bookmarkCount
 ) {
     public static ChallengeSubmissionCard from(Submission submission, String thumbnailUrl, String profileImageUrl) {
+        boolean deleted = submission.getUser().isDeleted();
         return new ChallengeSubmissionCard(
                 submission.getId(),
                 thumbnailUrl,
                 submission.getUser().getUserId(),
-                submission.getUser().getNickname(),
-                profileImageUrl,
+                deleted ? "삭제된 사용자" : submission.getUser().getNickname(),
+                deleted ? null : profileImageUrl,
                 submission.getLikeCount(),
                 submission.getCommentCount(),
                 submission.getBookmarkCount()
