@@ -58,6 +58,10 @@ public class UserService {
         saveInterestTags(user, request.interestTags());
 
         user.registerProfile(request.nickname(), request.intro());
+
+        if (request.profileImageKey() != null) {
+            user.updateProfile(user.getNickname(), user.getIntroduction(), request.profileImageKey());
+        }
     }
 
     @Transactional
@@ -68,6 +72,10 @@ public class UserService {
 
         user.updateInfo(request.nickname(), request.intro());
         journey.updateInfo(request.journeyLevel(), request.weeklyGoalScore());
+
+        if (request.profileImageKey() != null) {
+            user.updateProfile(user.getNickname(), user.getIntroduction(), request.profileImageKey());
+        }
 
         if (request.specialtyTags() != null) {
             userSpecialtyTagRepository.deleteAllByUser(user);

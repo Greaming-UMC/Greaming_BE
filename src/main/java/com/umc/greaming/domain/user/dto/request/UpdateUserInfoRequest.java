@@ -23,5 +23,8 @@ public record UpdateUserInfoRequest(
         JourneyLevel journeyLevel,
 
         @Schema(description = "주간 목표 점수", example = "5")
-        Integer weeklyGoalScore
+        Integer weeklyGoalScore,
+
+        @Schema(description = "프로필 이미지 S3 key (null이면 변경 없음, presigned URL 발급 후 업로드한 key)", example = "profile/abc123.jpg")
+        String profileImageKey
 ) {}

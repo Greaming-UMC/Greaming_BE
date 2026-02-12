@@ -92,6 +92,7 @@ public interface UserApi {
                     소셜 로그인 후 최초 1회 사용자 정보를 등록합니다.
 
                     - 닉네임, 자기소개, 전문 분야 태그, 관심 분야 태그, Journey 레벨, 주간 목표 점수를 설정합니다.
+                    - profileImageKey: S3 presigned URL로 업로드한 이미지 key (선택)
                     - 이미 정보가 등록된 유저는 409 에러가 반환됩니다.
                     """
     )
@@ -182,6 +183,7 @@ public interface UserApi {
 
                     - 모든 필드는 nullable이며, null인 필드는 변경하지 않습니다.
                     - 태그(specialtyTags, interestTags)는 null이면 변경 없음, 값을 보내면 전체 교체됩니다.
+                    - profileImageKey: S3 presigned URL로 업로드한 이미지 key (null이면 변경 없음)
                     - 최초 프로필 등록(registInfo)을 완료한 유저만 사용할 수 있습니다.
                     """
     )
