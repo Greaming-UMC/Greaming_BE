@@ -32,6 +32,7 @@ public class SecurityConfig {
             "/h2-console/**",
             "/api/works/**",
             "/swagger-ui/**",
+            "/swagger-ui.html",
             "/v3/api-docs/**",
             "/swagger-resources/**",
             "/webjars/**",
@@ -41,19 +42,6 @@ public class SecurityConfig {
             "/api/challenges/**",
             "/api/submissions"
     };
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers(
-                        "/h2-console/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-resources/**",
-                        "/webjars/**"
-                );
-        // [수정] /api/submissions/** 제거 - 인증이 필요한 경로임
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         HttpSecurity httpSecurity = http
