@@ -46,13 +46,11 @@ public class UserService {
             throw new GeneralException(ErrorStatus.USER_ALREADY_REGISTERED);
         }
 
-        UserJourny userJourny = UserJourny.builder()
-                .user(user)
-                .journeyLevel(request.journeyLevel())
-                .weeklyGoalScore(request.weeklyGoalScore())
-                .build();
-
-        userJournyRepository.save(userJourny);
+        UserJourny userJourny = userJournyRepository.findByUser(user)
+                .orElseGet(() -> userJournyRepository.save(
+                        UserJourny.builder().user(user).build()
+                ));
+        userJourny.updateInfo(request.journeyLevel(), request.weeklyGoalScore());
 
         saveSpecialtyTags(user, request.specialtyTags());
         saveInterestTags(user, request.interestTags());
