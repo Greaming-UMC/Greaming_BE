@@ -18,6 +18,8 @@ import java.util.UUID;
 public class S3Service {
 
     private final S3Presigner s3Presigner;
+    public static final String DEFAULT_PROFILE_IMAGE = "common/default_profile.png";
+    private final String defaultKey = createPath("common", "default_profile.jpg");
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
@@ -28,7 +30,7 @@ public class S3Service {
     // 공개 버킷용 String 합치기
     public String getPublicUrl(String key){
         if (key == null || key.isEmpty()){
-            return null;
+            return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, defaultKey);
         }
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
