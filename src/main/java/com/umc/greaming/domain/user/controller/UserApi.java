@@ -433,7 +433,7 @@ public interface UserApi {
             description = """
                     내 프로필 화면 상단 정보를 조회합니다.
                     
-                    - 닉네임, 프로필 이미지, Journey 레벨, 자기소개
+                    - 유저 ID, 닉네임, 프로필 이미지, Journey 레벨, 자기소개
                     - 팔로워/팔로잉 수
                     - 전문 분야 태그, 관심 분야 태그
                     - 챌린지 캘린더 정보 (일일/주간)
@@ -454,6 +454,7 @@ public interface UserApi {
                                       "message": "프로필 상단 정보 조회 성공",
                                       "result": {
                                         "userInformation": {
+                                          "userId": 1,
                                           "nickname": "그림쟁이",
                                           "profileImgUrl": "https://s3.amazonaws.com/...",
                                           "level": "PAINTER",

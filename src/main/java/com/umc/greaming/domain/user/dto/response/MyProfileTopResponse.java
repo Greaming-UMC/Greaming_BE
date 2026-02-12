@@ -21,6 +21,7 @@ public class MyProfileTopResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserInformation {
+        private Long userId;
         private String nickname;
         private String profileImgUrl;
         private String level;

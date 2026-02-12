@@ -15,6 +15,8 @@ import com.umc.greaming.domain.home.dto.response.HomeSubmissionsResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionDetailResponse;
 import com.umc.greaming.domain.submission.dto.response.SubmissionInfo;
 import com.umc.greaming.domain.submission.dto.response.SubmissionPreviewResponse;
+import com.umc.greaming.domain.submission.dto.response.UserSubmissionCard;
+import com.umc.greaming.domain.submission.dto.response.UserSubmissionsResponse;
 import com.umc.greaming.domain.submission.entity.Submission;
 import com.umc.greaming.domain.submission.repository.SubmissionImageRepository;
 import com.umc.greaming.domain.submission.repository.SubmissionLikeRepository;
@@ -136,6 +138,35 @@ public class SubmissionQueryService {
         Submission submission = submissionRepository.findByIdWithUserAndChallenge(submissionId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SUBMISSION_NOT_FOUND));
         return createSubmissionInfoFromEntity(submission, loginUser);
+    }
+
+
+    public UserSubmissionsResponse getUserSubmissions(Long userId, int page, int size, User loginUser) {
+        int validatedSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page - 1, validatedSize, sort);
+
+        Page<Submission> submissionPage = submissionRepository.findAllByUserId(userId, pageable);
+
+        List<UserSubmissionCard> submissionCards = submissionPage.getContent().stream()
+                .map(submission -> {
+                    String thumbnailUrl = s3Service.getPublicUrl(submission.getThumbnailKey());
+                    String profileImageUrl = s3Service.getPublicUrl(submission.getUser().getProfileImageKey());
+                    return UserSubmissionCard.from(submission, thumbnailUrl, profileImageUrl);
+                })
+                .toList();
+
+        UserSubmissionsResponse.PageInfo pageInfo = new UserSubmissionsResponse.PageInfo(
+                submissionPage.getNumber() + 1,
+                submissionPage.getSize(),
+                submissionPage.getTotalPages(),
+                submissionPage.getTotalElements(),
+                submissionPage.isLast(),
+                submissionPage.isFirst()
+        );
+        
+        return UserSubmissionsResponse.of(submissionCards, pageInfo);
     }
 
     private Submission findSubmissionByIdOrThrow(Long submissionId) {
