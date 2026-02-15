@@ -143,7 +143,9 @@ public interface SubmissionApi {
                                         "caption": "작품 설명입니다.",
                                         "tags": [{"tagId": 1, "tagName": "일러스트"}],
                                         "liked": false,
-                                        "uploadAt": "2026-02-10T10:00:00"
+                                        "uploadAt": "2026-02-10T10:00:00",
+                                        "field": "WEEKLY",
+                                        "challengeId": 123
                                       }
                                     }
                                     """
@@ -270,7 +272,9 @@ public interface SubmissionApi {
                                           "caption": "상세 설명입니다.",
                                           "tags": [{"tagId": 1, "tagName": "수채화"}],
                                           "liked": false,
-                                          "uploadAt": "2026-02-10T10:00:00"
+                                          "uploadAt": "2026-02-10T10:00:00",
+                                          "field": "WEEKLY",
+                                          "challengeId": 5
                                         },
                                         "commentPage": {
                                            "comments": [],
@@ -419,7 +423,9 @@ public interface SubmissionApi {
                                         "caption": "수정된 설명",
                                         "tags": [{"tagId": 2, "tagName": "수정태그"}],
                                         "liked": false,
-                                        "uploadAt": "2026-02-10T10:00:00"
+                                        "uploadAt": "2026-02-10T10:00:00",
+                                        "field": "WEEKLY",
+                                        "challengeId": 123
                                       }
                                     }
                                     """

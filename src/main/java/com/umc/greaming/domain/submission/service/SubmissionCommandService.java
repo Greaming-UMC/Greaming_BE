@@ -61,18 +61,12 @@ public class SubmissionCommandService {
                 .field(request.field())
                 .thumbnailKey(request.thumbnailKey());
 
-        if (request.challengeId() != null && !request.challengeId().trim().isEmpty()) {
-            try {
-                Long challengeIdLong = Long.parseLong(request.challengeId());
-                com.umc.greaming.domain.challenge.entity.Challenge challenge = 
-                        challengeRepository.findById(challengeIdLong)
-                                .orElseThrow(() -> new GeneralException(ErrorStatus.CHALLENGE_NOT_FOUND));
-                builder.challenge(challenge);
-                log.info("Challenge 매핑 완료 - Challenge ID: {}", challengeIdLong);
-            } catch (NumberFormatException e) {
-                log.error("Invalid challengeId format: {}", request.challengeId());
-                throw new GeneralException(ErrorStatus.BAD_REQUEST);
-            }
+        if (request.challengeId() != null) {
+            com.umc.greaming.domain.challenge.entity.Challenge challenge = 
+                    challengeRepository.findById(request.challengeId())
+                            .orElseThrow(() -> new GeneralException(ErrorStatus.CHALLENGE_NOT_FOUND));
+            builder.challenge(challenge);
+            log.info("Challenge 매핑 완료 - Challenge ID: {}", request.challengeId());
         }
 
         Submission submission = builder.build();
