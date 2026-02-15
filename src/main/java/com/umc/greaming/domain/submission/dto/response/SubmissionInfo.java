@@ -51,9 +51,15 @@ public record SubmissionInfo(
 
         @Schema(description = "업로드 일시", example = "2026-02-03T18:00:00")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime uploadAt
+        LocalDateTime uploadAt,
+
+        @Schema(description = "작품 분야", example = "WEEKLY")
+        String field,
+
+        @Schema(description = "챌린지 ID (null 가능)", example = "123")
+        Long challengeId
 ) {
-    // Factory Method
+
     public static SubmissionInfo from(Submission submission,
                                       String profileImageUrl,
                                       String level,
@@ -75,7 +81,9 @@ public record SubmissionInfo(
                 submission.getCaption(),
                 tags,
                 isLiked,
-                submission.getCreatedAt()
+                submission.getCreatedAt(),
+                submission.getField().name(),
+                submission.getChallenge() != null ? submission.getChallenge().getId() : null
         );
     }
 }
