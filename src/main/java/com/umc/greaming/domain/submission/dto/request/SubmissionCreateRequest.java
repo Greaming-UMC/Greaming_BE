@@ -23,6 +23,9 @@ public record SubmissionCreateRequest(
         @NotNull(message = "분야(field)는 필수입니다.")
         SubmissionField field,
 
+        @Schema(description = "챌린지 Id", example = "123")
+        String challengeId,
+
         @Schema(description = "썸네일 이미지 S3 Key (URL 아님)", example = "submissions/user1/thumb_uuid.jpg")
         @NotBlank(message = "썸네일 이미지는 필수입니다.")
         String thumbnailKey,

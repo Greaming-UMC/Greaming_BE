@@ -114,6 +114,7 @@ public interface SubmissionApi {
             - **field**: [WEEKLY, DAILY, FREE] 중 하나 필수
             - **visibility**: [PUBLIC, CIRCLE] 중 하나 필수
             - **thumbnailKey**: S3에서 발급받은 이미지 Key (URL 아님)
+            - **challengeId**: 챌린지 ID (선택, null 가능). WEEKLY/DAILY 작품인 경우 관련 챌린지 ID 입력
             """)
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -151,7 +152,7 @@ public interface SubmissionApi {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "입력값 검증 실패 (Enum 값 불일치 등)",
+                    description = "입력값 검증 실패 (Enum 값 불일치, challengeId 형식 오류 등)",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ApiResponse.class),
@@ -161,6 +162,24 @@ public interface SubmissionApi {
                                       "isSuccess": false,
                                       "code": "COMM_400",
                                       "message": "field 값은 WEEKLY, DAILY, FREE 중 하나여야 합니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 챌린지 (challengeId 제공 시)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "CHALLENGE_404",
+                                      "message": "챌린지를 찾을 수 없습니다.",
                                       "result": null
                                     }
                                     """

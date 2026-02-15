@@ -42,24 +42,40 @@ public class SubmissionCommandService {
     private final TagRepository tagRepository;
     private final WeeklyUserScoreRepository weeklyUserScoreRepository;
     private final S3Service s3Service;
+    private final com.umc.greaming.domain.challenge.repository.ChallengeRepository challengeRepository;
 
     public SubmissionInfo createSubmission(SubmissionCreateRequest request, User user) {
 
         log.info("=== createSubmission 시작 ===");
         log.info("User: {}", user != null ? user.getUserId() : "NULL");
         log.info("ProfileImageKey: {}", user != null ? user.getProfileImageKey() : "NULL");
-        log.info("Request - title: {}, thumbnailKey: {}", request.title(), request.thumbnailKey());
+        log.info("Request - title: {}, thumbnailKey: {}, challengeId: {}", 
+                request.title(), request.thumbnailKey(), request.challengeId());
 
-        Submission submission = Submission.builder()
+        Submission.SubmissionBuilder builder = Submission.builder()
                 .user(user)
                 .title(request.title())
                 .caption(request.caption())
                 .visibility(request.visibility())
                 .commentEnabled(request.commentEnabled())
                 .field(request.field())
-                .thumbnailKey(request.thumbnailKey())
-                .build();
+                .thumbnailKey(request.thumbnailKey());
 
+        if (request.challengeId() != null && !request.challengeId().trim().isEmpty()) {
+            try {
+                Long challengeIdLong = Long.parseLong(request.challengeId());
+                com.umc.greaming.domain.challenge.entity.Challenge challenge = 
+                        challengeRepository.findById(challengeIdLong)
+                                .orElseThrow(() -> new GeneralException(ErrorStatus.CHALLENGE_NOT_FOUND));
+                builder.challenge(challenge);
+                log.info("Challenge 매핑 완료 - Challenge ID: {}", challengeIdLong);
+            } catch (NumberFormatException e) {
+                log.error("Invalid challengeId format: {}", request.challengeId());
+                throw new GeneralException(ErrorStatus.BAD_REQUEST);
+            }
+        }
+
+        Submission submission = builder.build();
         submission = submissionRepository.saveAndFlush(submission);
         log.info("Submission 저장 완료 - ID: {}", submission.getId());
 
