@@ -4,6 +4,7 @@ import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.domain.comment.dto.request.CommentCreateRequest;
 import com.umc.greaming.domain.comment.dto.request.ReplyCreateRequest;
 import com.umc.greaming.domain.comment.dto.CommentInfo;
+import com.umc.greaming.domain.comment.dto.response.CommentLikeResponse;
 import com.umc.greaming.domain.comment.dto.response.ReplyResponse;
 import com.umc.greaming.domain.comment.dto.ReplyInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -204,6 +205,54 @@ public interface CommentApi {
     ResponseEntity<ApiResponse<ReplyInfo>> createReply(
             @Parameter(description = "부모 댓글 ID") @Positive @PathVariable("commentId") Long commentId,
             @RequestBody @Valid ReplyCreateRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
+    );
+
+    @Operation(summary = "댓글 좋아요 토글", description = "댓글에 좋아요를 추가하거나 취소합니다. (토글 방식)")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "댓글 좋아요 토글 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "LIKE_200",
+                                      "message": "좋아요 상태가 변경되었습니다.",
+                                      "result": {
+                                        "isLiked": true,
+                                        "likeCount": 6
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 댓글",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMENT_404",
+                                      "message": "댓글을 찾을 수 없습니다.",
+                                      "result": null
+                                    }
+                                    """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/{commentId}/likes")
+    ResponseEntity<ApiResponse<CommentLikeResponse>> toggleCommentLike(
+            @Parameter(description = "댓글 ID") @Positive @PathVariable("commentId") Long commentId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     );
 }
