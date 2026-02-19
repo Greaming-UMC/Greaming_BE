@@ -2,6 +2,7 @@ package com.umc.greaming.domain.follow.repository;
 
 import com.umc.greaming.domain.follow.entity.Follow;
 import com.umc.greaming.domain.follow.enums.FollowState;
+import com.umc.greaming.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
@@ -11,5 +12,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     long countByFollower_UserIdAndState(Long userId, FollowState state);
 
     boolean existsByFollower_UserIdAndFollowing_UserId(Long followerId, Long followingId);
+
+    void deleteByFollowerAndFollowing(User follower, User following);
 
 }
