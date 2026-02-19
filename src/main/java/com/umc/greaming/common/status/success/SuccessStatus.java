@@ -47,6 +47,7 @@ public enum SuccessStatus implements BaseStatus {
 
     //팔로우
     FOLLOW_TOGGLE_SUCCESS("FOLLOW_200", HttpStatus.OK, "팔로우 상태가 변경되었습니다."),
+    FOLLOW_LIST_SUCCESS("FOLLOW_200", HttpStatus.OK, "팔로우 목록 조회 성공"),
     
     // user
     USER_PROFILE_TOP_SUCCESS("USER_200", HttpStatus.OK, "내 프로필 화면 조회 성공"),
