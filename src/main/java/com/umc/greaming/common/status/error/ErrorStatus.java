@@ -52,6 +52,9 @@ public enum ErrorStatus implements BaseStatus {
     // Like (좋아요 - 추후 구현 대비)
     ALREADY_LIKED("LIKE_409", HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다."),
     SELF_LIKE_NOT_ALLOWED("LIKE_400", HttpStatus.BAD_REQUEST, "본인 글에는 좋아요를 누를 수 없습니다."),
+
+    // Follow
+    CANNOT_FOLLOW_SELF("FOLLOW_400", HttpStatus.BAD_REQUEST, "자기 자신을 팔로우할 수 없습니다."),
     // S3 Errors
     S3_UPLOAD_FAILED("S3_500", HttpStatus.INTERNAL_SERVER_ERROR, "Presigned URL 발급에 실패했습니다.");
 
