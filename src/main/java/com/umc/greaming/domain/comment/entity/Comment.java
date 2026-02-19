@@ -5,9 +5,12 @@ import com.umc.greaming.domain.submission.entity.Submission;
 import com.umc.greaming.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -40,6 +43,11 @@ public class Comment extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Reply> replies = new ArrayList<>();
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();

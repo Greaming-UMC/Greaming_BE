@@ -197,8 +197,10 @@ public class SubmissionQueryService {
                     boolean isCommentLiked = finalLikedCommentIds.contains(comment.getId());
 
                     boolean isWriter = (userId != null) && comment.getUser().getUserId().equals(userId);
+                    
+                    boolean hasReply = !comment.getReplies().isEmpty();
 
-                    return CommentInfo.from(comment, profileUrl, isCommentLiked, isWriter);
+                    return CommentInfo.from(comment, profileUrl, isCommentLiked, isWriter, hasReply);
                 })
                 .toList();
 
