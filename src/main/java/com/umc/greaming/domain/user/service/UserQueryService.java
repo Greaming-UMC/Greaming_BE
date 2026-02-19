@@ -9,6 +9,7 @@ import com.umc.greaming.domain.user.repository.*;
 import com.umc.greaming.domain.user.dto.response.MyProfileTopResponse;
 import com.umc.greaming.domain.user.dto.response.MyProfileSettingsResponse;
 import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
+import com.umc.greaming.domain.user.dto.response.UserProfileResponse;
 import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.entity.User;
 import com.umc.greaming.domain.user.entity.UserJourny;
@@ -95,6 +96,32 @@ public class UserQueryService {
                 journey.getJourneyLevel(),
                 journey.getWeeklyGoalScore()
         );
+    }
+
+    public UserProfileResponse getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        UserJourny journey = userJournyRepository.findByUser(user)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_PROFILE_NOT_FOUND));
+
+        List<String> specialtyTags = userSpecialtyTagRepository.findTagNamesByUserId(userId);
+        List<String> interestTags = userInterestTagRepository.findTagNamesByUserId(userId);
+
+        UserInfoResponse userInfo = new UserInfoResponse(
+                user.getNickname(),
+                user.getIntroduction(),
+                resolvePublicUrl(user.getProfileImageKey()),
+                specialtyTags,
+                interestTags,
+                journey.getJourneyLevel(),
+                journey.getWeeklyGoalScore()
+        );
+
+        long followerCount = followRepository.countByFollowing_UserIdAndState(userId, FollowState.COMPLETED);
+        long followingCount = followRepository.countByFollower_UserIdAndState(userId, FollowState.COMPLETED);
+
+        return new UserProfileResponse(userInfo, followerCount, followingCount);
     }
 
     public UserSearchResponse searchByNickname(String nickname) {
