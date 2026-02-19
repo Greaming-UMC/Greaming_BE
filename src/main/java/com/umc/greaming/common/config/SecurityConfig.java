@@ -64,6 +64,9 @@ public class SecurityConfig {
                                 HttpMethod.GET, "/api/user/*/info"  // 유저 정보 조회는 공개
                         ).permitAll()
                         .requestMatchers(
+                                HttpMethod.GET, "/api/users/*/followings", "/api/users/*/followers"  // 팔로우 목록 조회는 공개
+                        ).permitAll()
+                        .requestMatchers(
                                 "/actuator/**"
                         )
                         .hasRole("ADMIN")
