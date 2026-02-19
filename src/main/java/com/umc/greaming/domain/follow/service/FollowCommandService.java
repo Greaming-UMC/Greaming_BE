@@ -45,6 +45,7 @@ public class FollowCommandService {
                     .state(FollowState.COMPLETED)
                     .build();
             followRepository.save(follow);
+            followRepository.flush();
             isFollowing = true;
             log.info("팔로우 추가 - follower: {}, following: {}", me.getUserId(), targetUserId);
         }
