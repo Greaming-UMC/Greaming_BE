@@ -54,9 +54,10 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<ApiResponse<UserProfileResponse>> getUserInfo(
-            @PathVariable Long userId
+            @PathVariable Long userId,
+            @AuthenticationPrincipal Long loginUserId
     ) {
-        UserProfileResponse response = userQueryService.getUserProfile(userId);
+        UserProfileResponse response = userQueryService.getUserProfile(userId, loginUserId);
         return ApiResponse.success(SuccessStatus.USER_GET_INFO_SUCCESS, response);
     }
 

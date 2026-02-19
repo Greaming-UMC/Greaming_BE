@@ -98,7 +98,7 @@ public class UserQueryService {
         );
     }
 
-    public UserProfileResponse getUserProfile(Long userId) {
+    public UserProfileResponse getUserProfile(Long userId, Long myUserId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
@@ -121,7 +121,12 @@ public class UserQueryService {
         long followerCount = followRepository.countByFollowing_UserIdAndState(userId, FollowState.COMPLETED);
         long followingCount = followRepository.countByFollower_UserIdAndState(userId, FollowState.COMPLETED);
 
-        return new UserProfileResponse(userInfo, followerCount, followingCount);
+        boolean isFollower = myUserId != null &&
+                followRepository.existsByFollower_UserIdAndFollowing_UserId(userId, myUserId);
+        boolean isFollowing = myUserId != null &&
+                followRepository.existsByFollower_UserIdAndFollowing_UserId(myUserId, userId);
+
+        return new UserProfileResponse(userInfo, followerCount, followingCount, isFollower, isFollowing);
     }
 
     public UserSearchResponse searchByNickname(String nickname) {
