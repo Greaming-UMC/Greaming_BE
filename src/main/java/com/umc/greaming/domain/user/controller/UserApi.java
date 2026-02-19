@@ -283,7 +283,9 @@ public interface UserApi {
                                           "weeklyGoalScore": 5
                                         },
                                         "followerCount": 42,
-                                        "followingCount": 10
+                                        "followingCount": 10,
+                                        "isFollower": true,
+                                        "isFollowing": false
                                       }
                                     }
                                     """
@@ -311,7 +313,8 @@ public interface UserApi {
     })
     @GetMapping("/{userId}/info")
     ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.UserProfileResponse>> getUserInfo(
-            @Parameter(description = "조회할 유저 ID") @PathVariable Long userId
+            @Parameter(description = "조회할 유저 ID") @PathVariable Long userId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long loginUserId
     );
 
     @Operation(

@@ -35,6 +35,7 @@ public class FollowCommandService {
 
         if (followRepository.existsByFollower_UserIdAndFollowing_UserId(me.getUserId(), targetUserId)) {
             followRepository.deleteByFollowerAndFollowing(me, target);
+            followRepository.flush();
             isFollowing = false;
             log.info("팔로우 취소 - follower: {}, following: {}", me.getUserId(), targetUserId);
         } else {
@@ -44,6 +45,7 @@ public class FollowCommandService {
                     .state(FollowState.COMPLETED)
                     .build();
             followRepository.save(follow);
+            followRepository.flush();
             isFollowing = true;
             log.info("팔로우 추가 - follower: {}, following: {}", me.getUserId(), targetUserId);
         }
