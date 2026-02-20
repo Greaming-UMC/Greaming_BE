@@ -50,7 +50,7 @@ public class CommentCommandService {
 
         String profileUrl = s3Service.getPublicUrl(user.getProfileImageKey());
 
-        return CommentInfo.from(savedComment, profileUrl, false, true);
+        return CommentInfo.from(savedComment, profileUrl, false, true, false);
     }
 
     public ReplyInfo createReply(Long commentId, ReplyCreateRequest request, User user) {

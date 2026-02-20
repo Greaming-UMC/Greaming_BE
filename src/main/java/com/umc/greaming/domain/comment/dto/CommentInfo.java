@@ -22,9 +22,12 @@ public record CommentInfo(
         Boolean isLiked,
 
         @JsonProperty("isWriter")
-        Boolean isWriter
+        Boolean isWriter,
+
+        @JsonProperty("hasReply")
+        Boolean hasReply
 ) {
-    public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked, boolean isWriter) {
+    public static CommentInfo from(Comment comment, String profileUrl, boolean isLiked, boolean isWriter, boolean hasReply) {
         boolean deleted = comment.getUser().isDeleted();
         return new CommentInfo(
                 comment.getId(),
@@ -33,7 +36,8 @@ public record CommentInfo(
                 deleted ? null : profileUrl,
                 comment.getContent(),
                 isLiked,
-                isWriter
+                isWriter,
+                hasReply
         );
     }
 }
