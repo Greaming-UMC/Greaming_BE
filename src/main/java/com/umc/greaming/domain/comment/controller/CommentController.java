@@ -8,6 +8,7 @@ import com.umc.greaming.domain.comment.dto.request.CommentCreateRequest;
 import com.umc.greaming.domain.comment.dto.request.ReplyCreateRequest;
 import com.umc.greaming.domain.comment.dto.CommentInfo;
 import com.umc.greaming.domain.comment.dto.ReplyInfo;
+import com.umc.greaming.domain.comment.dto.response.CommentLikeResponse;
 import com.umc.greaming.domain.comment.dto.response.ReplyResponse;
 import com.umc.greaming.domain.comment.service.CommentCommandService;
 import com.umc.greaming.domain.comment.service.CommentQueryService;
@@ -62,5 +63,12 @@ public class CommentController implements CommentApi {
         }
         return userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<CommentLikeResponse>> toggleCommentLike(Long commentId, Long userId) {
+        User user = findUserOrThrow(userId);
+        CommentLikeResponse result = commentCommandService.toggleLike(commentId, user);
+        return ApiResponse.success(SuccessStatus.LIKE_TOGGLE_SUCCESS, result);
     }
 }

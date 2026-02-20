@@ -255,7 +255,7 @@ public interface UserApi {
                     유저의 프로필 정보를 조회합니다.
 
                     - 인증 없이 누구나 조회할 수 있습니다.
-                    - 닉네임, 자기소개, 프로필 이미지, 태그, Journey 레벨, 주간 목표 점수를 반환합니다.
+                    - 닉네임, 자기소개, 프로필 이미지, 태그, Journey 레벨, 주간 목표 점수, 팔로워/팔로잉 수를 반환합니다.
                     - 프로필 미등록 유저는 404 에러가 반환됩니다.
                     """
     )
@@ -273,13 +273,19 @@ public interface UserApi {
                                       "code": "USER_200",
                                       "message": "유저 정보 조회 성공",
                                       "result": {
-                                        "nickname": "그림쟁이",
-                                        "intro": "그림 그리는 것을 좋아합니다.",
-                                        "profileImgUrl": "https://s3.amazonaws.com/...",
-                                        "specialtyTags": ["일러스트", "캐릭터"],
-                                        "interestTags": ["풍경", "인물"],
-                                        "journeyLevel": "PAINTER",
-                                        "weeklyGoalScore": 5
+                                        "userInfo": {
+                                          "nickname": "그림쟁이",
+                                          "intro": "그림 그리는 것을 좋아합니다.",
+                                          "profileImgUrl": "https://s3.amazonaws.com/...",
+                                          "specialtyTags": ["일러스트", "캐릭터"],
+                                          "interestTags": ["풍경", "인물"],
+                                          "journeyLevel": "PAINTER",
+                                          "weeklyGoalScore": 5
+                                        },
+                                        "followerCount": 42,
+                                        "followingCount": 10,
+                                        "isFollower": true,
+                                        "isFollowing": false
                                       }
                                     }
                                     """
@@ -306,8 +312,9 @@ public interface UserApi {
             )
     })
     @GetMapping("/{userId}/info")
-    ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(
-            @Parameter(description = "조회할 유저 ID") @PathVariable Long userId
+    ResponseEntity<ApiResponse<com.umc.greaming.domain.user.dto.response.UserProfileResponse>> getUserInfo(
+            @Parameter(description = "조회할 유저 ID") @PathVariable Long userId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long loginUserId
     );
 
     @Operation(

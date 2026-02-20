@@ -4,7 +4,7 @@ import com.umc.greaming.common.response.ApiResponse;
 import com.umc.greaming.common.status.success.SuccessStatus;
 import com.umc.greaming.domain.user.dto.request.RegistInfoRequest;
 import com.umc.greaming.domain.user.dto.request.UpdateUserInfoRequest;
-import com.umc.greaming.domain.user.dto.response.UserInfoResponse;
+import com.umc.greaming.domain.user.dto.response.UserProfileResponse;
 import com.umc.greaming.domain.user.dto.response.UserSearchResponse;
 import com.umc.greaming.domain.user.service.UserQueryService;
 import com.umc.greaming.domain.user.service.UserService;
@@ -53,10 +53,11 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(
-            @PathVariable Long userId
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getUserInfo(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal Long loginUserId
     ) {
-        UserInfoResponse response = userQueryService.getUserInfo(userId);
+        UserProfileResponse response = userQueryService.getUserProfile(userId, loginUserId);
         return ApiResponse.success(SuccessStatus.USER_GET_INFO_SUCCESS, response);
     }
 
